@@ -11,7 +11,4 @@ final class MappingActionKindTests: XCTestCase {
         XCTAssertEqual(action.kind, .mouseWheelScrollRight)
     }
 
-    func testInitFromRunKindCreatesEmptyRunCommand() {
-        XCTAssertEqual(Scheme.Buttons.Mapping.Action(kind: .run), .arg1(.run("")))
-    }
 }

@@ -9,7 +9,7 @@ You need to grant Accessibility permission at first launch.
 2. Click the lock to make changes.
 3. Toggle “LinearMouse” on.
 
-https://user-images.githubusercontent.com/3000535/173173454-b4b8e7ae-5184-4b7a-ba72-f6ce8041f721.mp4
+LinearMouse quits after permission is granted. Open it again manually.
 
 ## Not working?
 
@@ -26,6 +26,6 @@ If the previous steps did not resolve the issue, you can try the following:
 1. Quit LinearMouse.
 2. Open Terminal.app.
 3. <p>Copy and paste the following command:</p>
-   <pre><code>tccutil reset Accessibility com.lujjjh.LinearMouse</code></pre>
+   <pre><code>tccutil reset Accessibility com.lujjjh.dev.LinearMouse</code></pre>
    Then press the return key.
 4. Launch LinearMouse and try again.

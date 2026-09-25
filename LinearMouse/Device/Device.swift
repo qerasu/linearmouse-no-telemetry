@@ -48,7 +48,6 @@ class Device {
     var productID: Int?
     var serialNumber: String?
     var buttonCount: Int?
-    var batteryLevel: Int?
     private let categoryValue: Category
 
     private weak var manager: DeviceManager?
@@ -185,8 +184,6 @@ class Device {
     private var removed = false
     private let removalLock = NSLock()
 
-    private var verbosedLoggingOn = Defaults[.verbosedLoggingOn]
-
     private let initialPointerResolution: Double
     private let initialUseLinearScalingMouseAcceleration: Int?
     lazy var logitechSettingsReconciler = LogitechDeviceSettingsReconciler(device: self)
@@ -290,7 +287,6 @@ class Device {
         let rawName = rawProductName ?? device.name
         name = rawName
         productName = rawProductName
-        batteryLevel = nil
         categoryValue = Self.detectCategory(for: device)
 
         initialPointerResolution =
@@ -326,23 +322,14 @@ class Device {
         }
 
         os_log(
-            "Device initialized: %{public}@: HIDPointerResolution=%{public}f, HIDPointerAccelerationType=%{public}@, battery=%{public}@",
+            "Device initialized: %{private}@: HIDPointerResolution=%{private}f, HIDPointerAccelerationType=%{private}@",
             log: Self.log,
             type: .info,
             String(describing: device),
             initialPointerResolution,
-            device.pointerAccelerationType ?? "(unknown)",
-            batteryLevel.map(formattedPercent) ?? "(unknown)"
+            device.pointerAccelerationType ?? "(unknown)"
         )
 
-        Defaults.observe(.verbosedLoggingOn) { [weak self] change in
-            guard let self else {
-                return
-            }
-
-            verbosedLoggingOn = change.newValue
-        }
-        .tieToLifetime(of: self)
     }
 
     func markRemoved() {
@@ -668,7 +655,7 @@ extension Device {
         }
         set {
             os_log(
-                "Update pointer acceleration for device: %{public}@: %{public}f",
+                "Update pointer acceleration for device: %{private}@: %{private}f",
                 log: Self.log,
                 type: .info,
                 String(describing: self),
@@ -700,7 +687,7 @@ extension Device {
         }
         set {
             os_log(
-                "Update pointer speed for device: %{public}@: %{public}f",
+                "Update pointer speed for device: %{private}@: %{private}f",
                 log: Self.log,
                 type: .info,
                 String(describing: self),
@@ -717,7 +704,7 @@ extension Device {
         .map { Double($0) / 65_536 } ?? Self.fallbackPointerAcceleration
 
         os_log(
-            "Restore pointer acceleration for device: %{public}@: %{public}f",
+            "Restore pointer acceleration for device: %{private}@: %{private}f",
             log: Self.log,
             type: .info,
             String(describing: device),
@@ -729,7 +716,7 @@ extension Device {
 
     func restorePointerSpeed() {
         os_log(
-            "Restore pointer speed for device: %{public}@: %{public}f",
+            "Restore pointer speed for device: %{private}@: %{private}f",
             log: Self.log,
             type: .info,
             String(describing: device),
@@ -767,16 +754,6 @@ extension Device {
     private func inputValueCallback(
         _ device: PointerDevice, _ value: IOHIDValue
     ) {
-        if verbosedLoggingOn {
-            os_log(
-                "Received input value from: %{public}@: %{public}@",
-                log: Self.log,
-                type: .info,
-                String(describing: device),
-                String(describing: value)
-            )
-        }
-
         guard let manager else {
             os_log("manager is nil", log: Self.log, type: .error)
             return
@@ -816,17 +793,6 @@ extension Device {
     private func inputReportCallback(_ device: PointerDevice, _ report: Data) {
         guard allowsDeviceWork else {
             return
-        }
-
-        if verbosedLoggingOn {
-            let reportHex = report.map { String(format: "%02X", $0) }.joined(separator: " ")
-            os_log(
-                "Received input report from: %{public}@: %{public}@",
-                log: Self.log,
-                type: .info,
-                String(describing: device),
-                String(describing: reportHex)
-            )
         }
 
         let context = InputReportContext(report: report, lastButtonStates: lastButtonStates)

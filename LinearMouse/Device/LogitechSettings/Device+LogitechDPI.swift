@@ -128,7 +128,7 @@ extension Device {
             let slot = logitechReceiverRouteSnapshot.map { String($0.slot) } ?? "direct"
             if let appliedDPI {
                 os_log(
-                    "Logitech hardware DPI %{public}@ succeeded: dpi=%{public}d device=%{public}@ slot=%{public}@ attempt=%{public}d duration=%{public}.3f",
+                    "Logitech hardware DPI %{private}@ succeeded: dpi=%{private}d device=%{private}@ slot=%{private}@ attempt=%{private}d duration=%{private}.3f",
                     log: Self.logitechDPILog,
                     type: .info,
                     phase,
@@ -142,7 +142,7 @@ extension Device {
             }
 
             os_log(
-                "Logitech hardware DPI %{public}@ attempt failed: dpi=%{public}d device=%{public}@ slot=%{public}@ attempt=%{public}d final=%{public}@ duration=%{public}.3f",
+                "Logitech hardware DPI %{private}@ attempt failed: dpi=%{private}d device=%{private}@ slot=%{private}@ attempt=%{private}d final=%{private}@ duration=%{private}.3f",
                 log: Self.logitechDPILog,
                 type: attempt.isFinal ? .error : .info,
                 phase,

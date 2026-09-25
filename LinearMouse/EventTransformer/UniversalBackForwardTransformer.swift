@@ -143,7 +143,7 @@ class UniversalBackForwardTransformer: EventTransformer {
             return event
         }
 
-        os_log("Convert to swipe: %{public}@", log: Self.log, type: .info, targetBundleIdentifierString)
+        os_log("Convert to swipe: %{private}@", log: Self.log, type: .info, targetBundleIdentifierString)
         GestureEvent(navigationSwipeSource: nil, direction: direction.hidDirection)?
             .post(tap: .cgSessionEventTap)
         return nil

@@ -3,10 +3,9 @@
 
 import Combine
 import Defaults
-import LaunchAtLogin
 import SwiftUI
 
-class StatusItem: NSObject, NSMenuDelegate {
+class StatusItem: NSObject {
     static let shared = StatusItem()
 
     private lazy var statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -15,8 +14,6 @@ class StatusItem: NSObject, NSMenuDelegate {
 
     private lazy var menu: NSMenu = {
         let menu = NSMenu()
-        menu.delegate = self
-
         menu.items = baseMenuItems()
 
         return menu
@@ -98,10 +95,6 @@ class StatusItem: NSObject, NSMenuDelegate {
         return configurationMenu
     }()
 
-    private var batteryItems = [NSMenuItem]()
-    private var batterySeparatorItem: NSMenuItem?
-    private var isMenuOpen = false
-
     override init() {
         super.init()
 
@@ -116,14 +109,11 @@ class StatusItem: NSObject, NSMenuDelegate {
 
         updateStatusItemPresentation()
 
-        startAtLoginItem.state = LaunchAtLogin.isEnabled ? .on : .off
-        LaunchAtLogin.publisher
+        StartAtLogin.shared.refresh()
+        StartAtLogin.shared.$isEnabled
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                // The publisher forwards the *requested* value even when the
-                // registration lands at `.requiresApproval` or fails, so re-read
-                // the actual `SMAppService` status to keep the checkmark truthful.
-                self?.startAtLoginItem.state = LaunchAtLogin.isEnabled ? .on : .off
+            .sink { [weak self] enabled in
+                self?.startAtLoginItem.state = enabled ? .on : .off
             }
             .store(in: &subscriptions)
 
@@ -134,6 +124,7 @@ class StatusItem: NSObject, NSMenuDelegate {
             queue: .main
         ) { [weak self] _ in
             self?.updateOpenSettingsForFrontmostApplicationItem()
+            StartAtLogin.shared.refresh()
         }
 
         AccessibilityPermission.pollingUntilEnabled { [weak self] in
@@ -141,23 +132,15 @@ class StatusItem: NSObject, NSMenuDelegate {
         }
     }
 
-    private func rebuildMenuItems(includeBatteryItems: Bool) {
-        guard includeBatteryItems else {
-            removeBatteryItems()
-            return
-        }
-
-        let items = makeBatteryItems()
-        updateBatteryItems(items)
-    }
-
     private static func migrateMenuBarVisibilityModeIfNeeded() {
-        guard !Defaults[.menuBarVisibilityModeMigrationCompleted] else {
-            return
+        if !Defaults[.menuBarVisibilityModeMigrationCompleted] {
+            Defaults[.menuBarVisibilityMode] = Defaults[.showInMenuBar] ? .always : .never
+            Defaults[.menuBarVisibilityModeMigrationCompleted] = true
         }
 
-        Defaults[.menuBarVisibilityMode] = Defaults[.showInMenuBar] ? .always : .never
-        Defaults[.menuBarVisibilityModeMigrationCompleted] = true
+        if Defaults[.menuBarVisibilityMode] == .whenAttentionNeeded {
+            Defaults[.menuBarVisibilityMode] = .always
+        }
     }
 
     private static func syncLegacyShowInMenuBar() {
@@ -165,94 +148,7 @@ class StatusItem: NSObject, NSMenuDelegate {
     }
 
     private func updateStatusItemPresentation() {
-        let currentBatteryLevel = currentDeviceBatteryLevel()
-        let menuBarBatteryDisplayMode = Defaults[.menuBarBatteryDisplayMode]
-        let shouldBeVisible = Self.menuBarIsVisible(
-            currentBatteryLevel: currentBatteryLevel,
-            visibilityMode: Defaults[.menuBarVisibilityMode],
-            batteryDisplayMode: menuBarBatteryDisplayMode
-        )
-        if statusItem.isVisible != shouldBeVisible {
-            statusItem.isVisible = shouldBeVisible
-        }
-        updateStatusItemBatteryIndicator(
-            currentBatteryLevel: currentBatteryLevel,
-            menuBarBatteryDisplayMode: menuBarBatteryDisplayMode
-        )
-    }
-
-    private func updateStatusItemBatteryIndicator(
-        currentBatteryLevel: Int?,
-        menuBarBatteryDisplayMode: MenuBarBatteryDisplayMode
-    ) {
-        guard let button = statusItem.button else {
-            return
-        }
-
-        let batteryTitle = currentBatteryIndicatorTitle(
-            currentBatteryLevel: currentBatteryLevel,
-            menuBarBatteryDisplayMode: menuBarBatteryDisplayMode
-        )
-        button.title = batteryTitle.map { " \($0)" } ?? ""
-        button.imagePosition = batteryTitle == nil ? .imageOnly : .imageLeft
-    }
-
-    private func currentBatteryIndicatorTitle(
-        currentBatteryLevel: Int?,
-        menuBarBatteryDisplayMode: MenuBarBatteryDisplayMode
-    ) -> String? {
-        Self.menuBarBatteryTitle(
-            currentBatteryLevel: currentBatteryLevel,
-            mode: menuBarBatteryDisplayMode
-        )
-    }
-
-    private func currentDeviceBatteryLevel() -> Int? {
-        guard let currentDevice = currentBatteryIndicatorDevice() else {
-            return nil
-        }
-
-        return BatteryDeviceMonitor.shared.currentDeviceBatteryLevel(for: currentDevice)
-    }
-
-    private func currentBatteryIndicatorDevice() -> Device? {
-        Self.menuBarBatteryDevice(
-            activeDeviceRef: DeviceManager.shared.lastActiveDeviceRef,
-            selectedDeviceRef: DeviceState.shared.currentDeviceRef
-        )
-    }
-
-    static func menuBarBatteryDevice<T: AnyObject>(activeDeviceRef: WeakRef<T>?, selectedDeviceRef: WeakRef<T>?) -> T? {
-        activeDeviceRef?.value ?? selectedDeviceRef?.value
-    }
-
-    static func menuBarBatteryTitle(currentBatteryLevel: Int?, mode: MenuBarBatteryDisplayMode) -> String? {
-        guard let threshold = mode.threshold,
-              let currentBatteryLevel
-        else {
-            return nil
-        }
-
-        guard currentBatteryLevel <= threshold else {
-            return nil
-        }
-
-        return formattedPercent(currentBatteryLevel)
-    }
-
-    static func menuBarIsVisible(
-        currentBatteryLevel: Int?,
-        visibilityMode: MenuBarVisibilityMode,
-        batteryDisplayMode: MenuBarBatteryDisplayMode
-    ) -> Bool {
-        switch visibilityMode {
-        case .always:
-            return true
-        case .whenAttentionNeeded:
-            return menuBarBatteryTitle(currentBatteryLevel: currentBatteryLevel, mode: batteryDisplayMode) != nil
-        case .never:
-            return false
-        }
+        statusItem.isVisible = Defaults[.menuBarVisibilityMode] != .never
     }
 
     private func baseMenuItems() -> [NSMenuItem] {
@@ -265,61 +161,6 @@ class StatusItem: NSObject, NSMenuDelegate {
             openSettingsForFrontmostApplicationItem,
             quitItem
         ]
-    }
-
-    private func makeBatteryItems() -> [NSMenuItem] {
-        BatteryDeviceMonitor.shared
-            .devices
-            .map { ($0.name, $0.batteryLevel) }
-            .sorted { lhs, rhs in
-                lhs.0.localizedCaseInsensitiveCompare(rhs.0) == .orderedAscending
-            }
-            .map { name, batteryLevel in
-                let item = NSMenuItem(
-                    title: "\(name) - \(formattedPercent(batteryLevel))",
-                    action: nil,
-                    keyEquivalent: ""
-                )
-                item.isEnabled = false
-                return item
-            }
-    }
-
-    private func updateBatteryItems(_ items: [NSMenuItem]) {
-        removeBatteryItems()
-
-        guard !items.isEmpty else {
-            return
-        }
-
-        let header = makeSectionHeader(title: NSLocalizedString("Batteries", comment: ""))
-        let separator = NSMenuItem.separator()
-        menu.insertItem(separator, at: 0)
-        for item in items.reversed() {
-            menu.insertItem(item, at: 0)
-        }
-        menu.insertItem(header, at: 0)
-
-        batteryItems = [header] + items
-        batterySeparatorItem = separator
-    }
-
-    private func removeBatteryItems() {
-        for item in batteryItems {
-            menu.removeItem(item)
-        }
-        batteryItems.removeAll()
-
-        if let batterySeparatorItem {
-            menu.removeItem(batterySeparatorItem)
-            self.batterySeparatorItem = nil
-        }
-    }
-
-    private func makeSectionHeader(title: String) -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
-        item.isEnabled = false
-        return item
     }
 
     private func updateOpenSettingsForFrontmostApplicationItem() {
@@ -344,38 +185,6 @@ class StatusItem: NSObject, NSMenuDelegate {
     private func setup() {
         statusItem.menu = menu
 
-        BatteryDeviceMonitor.shared
-            .$devices
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                guard let self, self.statusItem.menu != nil else {
-                    return
-                }
-
-                self.updateStatusItemPresentation()
-
-                if self.isMenuOpen {
-                    self.rebuildMenuItems(includeBatteryItems: true)
-                }
-            }
-            .store(in: &subscriptions)
-
-        DeviceState.shared
-            .$currentDeviceRef
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.updateStatusItemPresentation()
-            }
-            .store(in: &subscriptions)
-
-        DeviceManager.shared
-            .$lastActiveDeviceRef
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.updateStatusItemPresentation()
-            }
-            .store(in: &subscriptions)
-
         Defaults.observe(.menuBarVisibilityMode) { [weak self] _ in
             guard let self else {
                 return
@@ -385,21 +194,6 @@ class StatusItem: NSObject, NSMenuDelegate {
             self.updateStatusItemPresentation()
         }
         .tieToLifetime(of: self)
-
-        Defaults.observe(.menuBarBatteryDisplayMode) { [weak self] _ in
-            self?.updateStatusItemPresentation()
-        }
-        .tieToLifetime(of: self)
-    }
-
-    func menuWillOpen(_: NSMenu) {
-        isMenuOpen = true
-        rebuildMenuItems(includeBatteryItems: true)
-    }
-
-    func menuDidClose(_: NSMenu) {
-        isMenuOpen = false
-        rebuildMenuItems(includeBatteryItems: false)
     }
 
     @objc private func statusItemAction(sender _: NSStatusBarButton) {
@@ -437,7 +231,9 @@ class StatusItem: NSObject, NSMenuDelegate {
     }
 
     @objc private func toggleStartAtLogin() {
-        LaunchAtLogin.isEnabled.toggle()
+        let startAtLogin = StartAtLogin.shared
+        startAtLogin.refresh()
+        startAtLogin.setEnabled(!startAtLogin.isEnabled)
     }
 
     @objc private func quit() {

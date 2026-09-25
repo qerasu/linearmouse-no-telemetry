@@ -64,8 +64,6 @@ extension Scheme.Buttons.Mapping.Action {
     }
 
     enum Arg1: Equatable, Hashable {
-        case run(String)
-
         case mouseWheelScrollUp(Scheme.Scrolling.Distance)
         case mouseWheelScrollDown(Scheme.Scrolling.Distance)
         case mouseWheelScrollLeft(Scheme.Scrolling.Distance)

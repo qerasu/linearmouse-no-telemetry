@@ -16,7 +16,6 @@ class DeviceModel: ObservableObject, Identifiable {
 
     @Published var name: String
     @Published var displayName: String
-    @Published var batteryLevel: Int?
     @Published var pairedReceiverDevices: [ReceiverLogicalDeviceIdentity] = []
     let category: Device.Category
 
@@ -27,7 +26,6 @@ class DeviceModel: ObservableObject, Identifiable {
         let initialName = deviceRef.value?.name ?? "(removed)"
         name = initialName
         displayName = initialName
-        batteryLevel = deviceRef.value?.batteryLevel
         category = deviceRef.value?.category ?? .mouse
 
         DeviceManager.shared
@@ -48,16 +46,7 @@ class DeviceModel: ObservableObject, Identifiable {
             }
             .store(in: &subscriptions)
 
-        BatteryDeviceMonitor.shared
-            .$devices
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.refreshBatteryLevel()
-            }
-            .store(in: &subscriptions)
-
         refreshReceiverPresentation()
-        refreshBatteryLevel()
     }
 
     private func refreshReceiverPresentation() {
@@ -75,26 +64,9 @@ class DeviceModel: ObservableObject, Identifiable {
         pairedReceiverDevices = pairedDevices
         displayName = DeviceManager.displayName(baseName: preferredName, pairedDevices: pairedDevices)
     }
-
-    private func refreshBatteryLevel() {
-        guard let device = deviceRef.value else {
-            batteryLevel = nil
-            return
-        }
-
-        batteryLevel = BatteryDeviceMonitor.shared.currentDeviceBatteryLevel(for: device) ?? device.batteryLevel
-    }
 }
 
 extension DeviceModel {
-    var batteryDescription: String? {
-        guard pairedReceiverDevices.isEmpty else {
-            return nil
-        }
-
-        return batteryLevel.map(formattedPercent)
-    }
-
     var isMouse: Bool {
         category == .mouse
     }

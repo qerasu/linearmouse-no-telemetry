@@ -87,18 +87,6 @@ private final class ButtonMappingTestKeySimulator: KeySimulating {
         events.append(.reset)
     }
 
-    func press(
-        keyCode _: CGKeyCode,
-        modifierFlags _: CGEventFlags,
-        restoringModifierFlags _: CGEventFlags,
-        tap _: CGEventTapLocation?
-    ) throws {
-        XCTFail("Button mappings should send configured keys, not resolved zoom shortcuts")
-    }
-
-    func modifiedCGEventFlags(of _: CGEvent) -> CGEventFlags? {
-        nil
-    }
 }
 
 final class ButtonMappingTransformerTests: XCTestCase {
@@ -486,8 +474,8 @@ final class ButtonMappingTransformerTests: XCTestCase {
         let keySimulator = ButtonMappingTestKeySimulator()
         let transformer = makeTransformer(
             mappings: [
-                buttonMapping(button: 4, short: .arg1(.keyPress([.a]))),
-                buttonMapping(button: 5, short: .arg1(.keyPress([.b])))
+                buttonMapping(button: 4, short: .arg1(.keyPress([.arrowLeft]))),
+                buttonMapping(button: 5, short: .arg1(.keyPress([.arrowRight])))
             ],
             scheduler: scheduler,
             keySimulator: keySimulator
@@ -513,9 +501,9 @@ final class ButtonMappingTransformerTests: XCTestCase {
         let actionsPerformed = expectation(description: "both short press actions performed")
         DispatchQueue.main.async {
             XCTAssertEqual(keySimulator.events, [
-                .press([.b]),
+                .press([.arrowRight]),
                 .reset,
-                .press([.a]),
+                .press([.arrowLeft]),
                 .reset
             ])
             actionsPerformed.fulfill()

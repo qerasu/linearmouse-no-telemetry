@@ -156,8 +156,7 @@ final class LogitechHardwareBaselineStoreTests: XCTestCase {
                 kind: .mouse,
                 name: "",
                 serialNumber: "ABC123",
-                productID: nil,
-                batteryLevel: nil
+                productID: nil
             )
         ))
 
@@ -175,8 +174,7 @@ final class LogitechHardwareBaselineStoreTests: XCTestCase {
             kind: .mouse,
             name: "USB Receiver",
             serialNumber: nil,
-            productID: 0xC52F,
-            batteryLevel: nil
+            productID: 0xC52F
         )
         let target = LogitechHardwareTargetKey.receiver(
             vendorID: 0x046D,
@@ -446,8 +444,7 @@ final class LogitechHardwareBaselineStoreTests: XCTestCase {
             kind: .mouse,
             name: "MX Master",
             serialNumber: serial,
-            productID: productID,
-            batteryLevel: nil
+            productID: productID
         )
     }
 

@@ -70,7 +70,7 @@ class ScreenManager: ObservableObject {
 
     private func updateScreens() {
         screens = NSScreen.screens
-        os_log("Displays changed: %{public}@", String(describing: screens))
+        os_log("Displays changed: %{private}@", String(describing: screens))
     }
 
     private func update() {
@@ -79,7 +79,7 @@ class ScreenManager: ObservableObject {
             currentScreen = screen
             currentScreenName = screen?.nameOrLocalizedName
             os_log(
-                "Current display changed: %{public}@: %{public}@",
+                "Current display changed: %{private}@: %{private}@",
                 String(describing: screen),
                 String(describing: currentScreenName)
             )

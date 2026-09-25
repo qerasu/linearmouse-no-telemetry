@@ -75,7 +75,6 @@ struct ReceiverLogicalDeviceIdentity: Hashable {
     let name: String
     let serialNumber: String?
     let productID: Int?
-    let batteryLevel: Int?
 
     func isSameLogicalDevice(as other: Self) -> Bool {
         receiverLocationID == other.receiverLocationID && slot == other.slot

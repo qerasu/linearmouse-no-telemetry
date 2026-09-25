@@ -22,11 +22,6 @@ struct AccessibilityPermissionView: View {
             )
             .padding(.horizontal)
 
-            HyperLink(URL(string: "https://go.linearmouse.app/accessibility-permission")!) {
-                Text("Get more help")
-            }
-            .padding(.horizontal)
-
             Spacer()
 
             HStack {

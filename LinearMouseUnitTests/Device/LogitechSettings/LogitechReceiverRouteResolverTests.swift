@@ -50,19 +50,6 @@ final class LogitechReceiverRouteResolverTests: XCTestCase {
         ))
     }
 
-    func testRouteEqualityIgnoresBatteryOnlyUpdates() {
-        let first = LogitechReceiverRoute(
-            slot: 2,
-            identity: receiverIdentity(slot: 2, name: "MX Master 3S", batteryLevel: 40)
-        )
-        let updated = LogitechReceiverRoute(
-            slot: 2,
-            identity: receiverIdentity(slot: 2, name: "MX Master 3S", batteryLevel: 80)
-        )
-
-        XCTAssertEqual(first, updated)
-    }
-
     private func receiver(
         productID: Int,
         transport: String = PointerDeviceTransportName.usb
@@ -98,8 +85,7 @@ final class LogitechReceiverRouteResolverTests: XCTestCase {
         slot: UInt8,
         name: String,
         serialNumber: String? = nil,
-        productID: Int? = nil,
-        batteryLevel: Int? = nil
+        productID: Int? = nil
     ) -> ReceiverLogicalDeviceIdentity {
         ReceiverLogicalDeviceIdentity(
             receiverLocationID: 123,
@@ -107,8 +93,7 @@ final class LogitechReceiverRouteResolverTests: XCTestCase {
             kind: .mouse,
             name: name,
             serialNumber: serialNumber,
-            productID: productID,
-            batteryLevel: batteryLevel
+            productID: productID
         )
     }
 }

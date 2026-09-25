@@ -219,7 +219,7 @@ class EventTransformerManager {
                 )
             }
             os_log(
-                "Return noop transformer because this event is sent by %{public}s",
+                "Return noop transformer because this event is sent by %{private}s",
                 log: Self.log,
                 type: .info,
                 sourcePid?.bundleIdentifier ?? "(unknown)"
@@ -239,7 +239,7 @@ class EventTransformerManager {
                 )
             }
             os_log(
-                "Return noop transformer because the source application %{public}s is in the bypass set",
+                "Return noop transformer because the source application %{private}s is in the bypass set",
                 log: Self.log,
                 type: .info,
                 sourceBundleIdentifier
@@ -741,16 +741,6 @@ class EventTransformerManager {
         )
 
         // TODO: Patch EventTransformer instead of rebuilding it
-
-        os_log(
-            "Initialize EventTransformer with scheme: %{public}@ (device=%{public}@, pid=%{public}@, screen=%{public}@)",
-            log: Self.log,
-            type: .info,
-            String(describing: scheme),
-            String(describing: device),
-            String(describing: process?.pid),
-            String(describing: display)
-        )
 
         var eventTransformer: [EventTransformer] = []
 

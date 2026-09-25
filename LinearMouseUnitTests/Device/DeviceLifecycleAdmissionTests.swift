@@ -299,8 +299,7 @@ final class DeviceLifecycleAdmissionTests: XCTestCase {
             kind: .mouse,
             name: "Mouse",
             serialNumber: serial,
-            productID: productID,
-            batteryLevel: nil
+            productID: productID
         )
     }
 }

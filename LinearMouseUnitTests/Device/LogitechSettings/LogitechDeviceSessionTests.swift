@@ -1328,8 +1328,7 @@ final class LogitechDeviceSessionTests: XCTestCase {
             kind: .mouse,
             name: "MX Mouse",
             serialNumber: serialNumber,
-            productID: productID,
-            batteryLevel: nil
+            productID: productID
         )
         return .init(
             identities: [identity],

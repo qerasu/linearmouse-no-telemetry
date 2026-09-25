@@ -143,7 +143,6 @@ extension ButtonActionExecutor {
                 return false
             }
             if !keysToPress.isEmpty {
-                os_log("Down keys: %{public}@", log: Self.log, type: .info, String(describing: keysToPress))
                 try? keySimulator.down(keys: keysToPress, tap: .cgSessionEventTap)
             }
 
@@ -173,7 +172,6 @@ extension ButtonActionExecutor {
                 return
             }
             guard let keys = runtimeState.heldKeys.removeValue(forKey: buttons) else {
-                os_log("Up keys: %{public}@", log: Self.log, type: .info, String(describing: fallbackKeys))
                 try? keySimulator.up(keys: fallbackKeys.reversed(), tap: .cgSessionEventTap)
                 resetKeySimulatorIfNothingIsHeld()
                 return
@@ -191,7 +189,6 @@ extension ButtonActionExecutor {
                 return true
             }
             if !keysToRelease.isEmpty {
-                os_log("Up keys: %{public}@", log: Self.log, type: .info, String(describing: keysToRelease))
                 try? keySimulator.up(keys: Array(keysToRelease), tap: .cgSessionEventTap)
             }
             resetKeySimulatorIfNothingIsHeld()
@@ -344,7 +341,7 @@ extension ButtonActionExecutor {
             )
             if result != .success {
                 os_log(
-                    "Failed to disable AXEnhancedUserInterface: %{public}@",
+                    "Failed to disable AXEnhancedUserInterface: %{private}@",
                     log: Self.log,
                     type: .error,
                     String(describing: result)
@@ -361,7 +358,7 @@ extension ButtonActionExecutor {
                 )
                 if result != .success {
                     os_log(
-                        "Failed to restore AXEnhancedUserInterface: %{public}@",
+                        "Failed to restore AXEnhancedUserInterface: %{private}@",
                         log: Self.log,
                         type: .error,
                         String(describing: result)
@@ -400,7 +397,7 @@ extension ButtonActionExecutor {
             || positionResult != .success
             || finalSizeResult != .success {
             os_log(
-                "Failed to set window frame: size=%{public}@, position=%{public}@, finalSize=%{public}@",
+                "Failed to set window frame: size=%{private}@, position=%{private}@, finalSize=%{private}@",
                 log: Self.log,
                 type: .error,
                 String(describing: initialSizeResult),
@@ -476,17 +473,10 @@ extension ButtonActionExecutor {
         targetBundleIdentifier: String?
     ) {
         do {
-            os_log(
-                "Execute action: %{public}@",
-                log: Self.log,
-                type: .info,
-                String(describing: action)
-            )
-
             try execute(action: action, targetBundleIdentifier: targetBundleIdentifier)
         } catch {
             os_log(
-                "Failed to execute: %{public}@: %{public}@",
+                "Failed to execute: %{private}@: %{private}@",
                 log: Self.log,
                 type: .error,
                 String(describing: action),
@@ -600,12 +590,6 @@ extension ButtonActionExecutor {
 
         case .arg0(.mouseButtonForward):
             postMouseButtonAction(mouseButton: .forward, targetBundleIdentifier: targetBundleIdentifier)
-
-        case let .arg1(.run(command)):
-            let task = Process()
-            task.launchPath = "/bin/bash"
-            task.arguments = ["-c", command]
-            task.launch()
 
         case let .arg1(.mouseWheelScrollUp(distance)):
             postScrollEvent(direction: .up, distance: distance)

@@ -106,10 +106,6 @@ extension ButtonMappingActionPicker {
             .actionType(.arg0(.mouseButtonBack)),
             .actionType(.arg0(.mouseButtonForward))
         ]
-        },
-        .section("Execute") { [
-            .actionType(.run)
-        ]
         }
     ]
 }

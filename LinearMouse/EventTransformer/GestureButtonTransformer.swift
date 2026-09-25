@@ -174,7 +174,7 @@ extension GestureButtonTransformer: EventTransformer {
 
         // Check if threshold is met
         if let action = detectGesture(deltaX: deltaX, deltaY: deltaY) {
-            os_log("Gesture detected: %{public}@", log: Self.log, type: .info, String(describing: action))
+            os_log("Gesture detected: %{private}@", log: Self.log, type: .info, String(describing: action))
 
             // Execute the gesture
             do {
@@ -187,7 +187,7 @@ extension GestureButtonTransformer: EventTransformer {
 
                 os_log("Entering cooldown for %d ms", log: Self.log, type: .info, cooldownMs)
             } catch {
-                os_log("Failed to execute gesture: %{public}@", log: Self.log, type: .error, error.localizedDescription)
+                os_log("Failed to execute gesture: %{private}@", log: Self.log, type: .error, error.localizedDescription)
                 state = .idle
             }
 

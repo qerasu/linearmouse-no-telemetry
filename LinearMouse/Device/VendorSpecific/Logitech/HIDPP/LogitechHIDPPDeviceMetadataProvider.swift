@@ -11,7 +11,7 @@ import os.log
 import PointerKit
 
 /// Discovers Logitech HID++ metadata and owns shared receiver/device transports.
-struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider {
+struct LogitechHIDPPDeviceMetadataProvider {
     static let log = OSLog(
         subsystem: Bundle.main.bundleIdentifier ?? "LinearMouse",
         category: "LogitechHIDPP"
@@ -149,14 +149,7 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
         let name: String?
         let productID: Int?
         let serialNumber: String?
-        let batteryLevel: Int?
         let hasLiveMetadata: Bool
-    }
-
-    struct ReceiverSlotMetadata {
-        let slot: UInt8
-        let name: String?
-        let batteryLevel: Int?
     }
 
     struct ReceiverConnectionSnapshot: Equatable {
@@ -244,35 +237,8 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
         let name: String?
         let serialNumber: String?
         let productID: Int?
-        let batteryLevel: Int?
         let hasLiveMetadata: Bool
     }
-
-    private enum ApproximateBatteryLevel: UInt8 {
-        case full = 8
-        case good = 4
-        case low = 2
-        case critical = 1
-
-        var percent: Int {
-            switch self {
-            case .full:
-                return 100
-            case .good:
-                return 50
-            case .low:
-                return 20
-            case .critical:
-                return 5
-            }
-        }
-    }
-
-    let matcher = VendorSpecificDeviceMatcher(
-        vendorID: Constants.vendorID,
-        productIDs: nil,
-        transports: [PointerDeviceTransportName.bluetoothLowEnergy, PointerDeviceTransportName.usb]
-    )
 
     enum ReceiverProtocolFamily: Equatable {
         case classic
@@ -334,55 +300,10 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
         return Constants.knownReceiverProductIDs.contains(productID)
     }
 
-    func matches(device: VendorSpecificDeviceContext) -> Bool {
-        let maxInputReportSize = device.maxInputReportSize ?? 0
-        let maxOutputReportSize = device.maxOutputReportSize ?? 0
-
-        if isReceiverVendorChannel(device) {
-            return false
-        }
-
-        return matcher.matches(device: device)
-            && maxInputReportSize >= Constants.shortReportLength
-            && maxOutputReportSize >= Constants.shortReportLength
-    }
-
-    func metadata(
-        for device: VendorSpecificDeviceContext,
-        deadline: Date?,
-        until operationShouldContinue: @escaping () -> Bool
-    ) -> VendorSpecificDeviceMetadata? {
-        let shouldContinue = {
-            operationShouldContinue()
-                && deadline.map { Date() < $0 } != false
-        }
-        guard shouldContinue() else {
-            return nil
-        }
-
-        if let directTransport = directTransport(
-            for: device,
-            deadline: deadline,
-            until: shouldContinue
-        ) {
-            return metadata(using: directTransport)
-        }
-
-        if let receiverTransport = receiverTransport(
-            for: device,
-            deadline: deadline,
-            until: shouldContinue
-        ) {
-            return metadata(using: receiverTransport)
-        }
-
-        return nil
-    }
-
     func receiverPointingDeviceDiscovery(for device: VendorSpecificDeviceContext) -> ReceiverPointingDeviceDiscovery {
         guard device.transport == PointerDeviceTransportName.usb else {
             os_log(
-                "Skip receiver discovery for non-USB device: name=%{public}@ transport=%{public}@",
+                "Skip receiver discovery for non-USB device: name=%{private}@ transport=%{private}@",
                 log: Self.log,
                 type: .info,
                 device.name,
@@ -393,7 +314,7 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
 
         guard let locationID = device.locationID else {
             os_log(
-                "Skip receiver discovery without locationID: name=%{public}@",
+                "Skip receiver discovery without locationID: name=%{private}@",
                 log: Self.log,
                 type: .info,
                 device.name
@@ -403,7 +324,7 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
 
         guard let receiverChannel = openReceiverChannel(for: device) else {
             os_log(
-                "Failed to open receiver channel: locationID=%{public}d name=%{public}@",
+                "Failed to open receiver channel: locationID=%{private}d name=%{private}@",
                 log: Self.log,
                 type: .info,
                 locationID,
@@ -416,14 +337,13 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
         let slots = discovery.identities
 
         let slotSummary = slots.map { identity in
-            let battery = identity.batteryLevel.map(String.init) ?? "(nil)"
             let name = identity.name
-            return "slot=\(identity.slot) kind=\(identity.kind.rawValue) name=\(name) battery=\(battery)"
+            return "slot=\(identity.slot) kind=\(identity.kind.rawValue) name=\(name)"
         }
         .joined(separator: ", ")
 
         os_log(
-            "Receiver discovery produced identities: locationID=%{public}d count=%{public}u identities=%{public}@",
+            "Receiver discovery produced identities: locationID=%{private}d count=%{private}u identities=%{private}@",
             log: Self.log,
             type: .info,
             locationID,
@@ -624,8 +544,7 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
             kind: kind,
             name: slotInfo.name ?? device.product ?? device.name,
             serialNumber: slotInfo.serialNumber,
-            productID: slotInfo.productID,
-            batteryLevel: slotInfo.batteryLevel
+            productID: slotInfo.productID
         )
     }
 
@@ -674,8 +593,7 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
             kind: kind,
             name: device.product ?? device.name,
             serialNumber: slotInfo.serialNumber,
-            productID: slotInfo.productID,
-            batteryLevel: nil
+            productID: slotInfo.productID
         )
     }
 
@@ -713,7 +631,7 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
               let receiverChannel = LogitechReceiverChannel.open(locationID: locationID)
         else {
             os_log(
-                "Skip receiver wait because channel is unavailable: name=%{public}@ transport=%{public}@ locationID=%{public}@",
+                "Skip receiver wait because channel is unavailable: name=%{private}@ transport=%{private}@ locationID=%{private}@",
                 log: Self.log,
                 type: .info,
                 device.name,
@@ -781,60 +699,6 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
         case nil:
             return false
         }
-    }
-
-    private func metadata(using transport: HIDPPTransport) -> VendorSpecificDeviceMetadata? {
-        let name = readFriendlyName(using: transport) ?? readName(using: transport)
-        let batteryLevel = transport
-            .isReceiverRoutedDevice ? readReceiverBatteryLevel(using: transport) : readBatteryLevel(using: transport)
-
-        if name == nil, batteryLevel == nil {
-            return nil
-        }
-
-        return VendorSpecificDeviceMetadata(name: name, batteryLevel: batteryLevel)
-    }
-
-    private func directTransport(
-        for device: VendorSpecificDeviceContext,
-        deadline: Date?,
-        until shouldContinue: @escaping () -> Bool
-    ) -> HIDPPTransport? {
-        guard device.transport == PointerDeviceTransportName.bluetoothLowEnergy else {
-            return nil
-        }
-
-        return HIDPPTransport(
-            device: device,
-            deviceIndex: nil,
-            deadline: deadline,
-            shouldContinue: shouldContinue
-        )
-    }
-
-    private func receiverTransport(
-        for device: VendorSpecificDeviceContext,
-        deadline: Date?,
-        until shouldContinue: @escaping () -> Bool
-    ) -> HIDPPTransport? {
-        guard device.transport == PointerDeviceTransportName.usb,
-              let locationID = device.locationID,
-              let receiverChannel = LogitechReceiverChannel.open(locationID: locationID),
-              let slot = discoverReceiverSlot(
-                  for: device,
-                  using: receiverChannel,
-                  until: shouldContinue
-              )?.slot
-        else {
-            return nil
-        }
-
-        return HIDPPTransport(
-            device: receiverChannel,
-            deviceIndex: slot,
-            deadline: deadline,
-            shouldContinue: shouldContinue
-        )
     }
 
     private func discoverReceiverSlot(
@@ -1005,26 +869,6 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
         return nil
     }
 
-    fileprivate func discoverRoutedSlots(using receiver: LogitechReceiverChannel) -> [ReceiverSlotMetadata] {
-        var results = [ReceiverSlotMetadata]()
-
-        for slot in UInt8(1) ... UInt8(6) {
-            guard let transport = HIDPPTransport(device: receiver, deviceIndex: slot) else {
-                continue
-            }
-
-            let name = readFriendlyName(using: transport) ?? readName(using: transport)
-            let batteryLevel = readReceiverBatteryLevel(using: transport)
-            guard name != nil || batteryLevel != nil else {
-                continue
-            }
-
-            results.append(.init(slot: slot, name: name, batteryLevel: batteryLevel))
-        }
-
-        return results
-    }
-
     private func preferredReceiverDeviceKinds(for device: VendorSpecificDeviceContext) -> Set<UInt8> {
         guard device.primaryUsagePage == kHIDPage_GenericDesktop else {
             return []
@@ -1105,61 +949,6 @@ struct LogitechHIDPPDeviceMetadataProvider: VendorSpecificDeviceMetadataProvider
 
         let trimmed = Array(bytes.prefix(length).prefix { $0 != 0 })
         return String(bytes: trimmed.isEmpty ? Array(bytes.prefix(length)) : trimmed, encoding: .utf8)
-    }
-
-    fileprivate func readBatteryLevel(using transport: HIDPPTransport) -> Int? {
-        if let featureIndex = transport.featureIndex(for: .batteryStatus),
-           let response = transport.request(featureIndex: featureIndex, function: 0x00, parameters: []),
-           response.payload.count >= 3,
-           let level = response.payload.first,
-           (1 ... 100).contains(level) {
-            return Int(level)
-        }
-
-        if let featureIndex = transport.featureIndex(for: .unifiedBattery),
-           let response = transport.request(featureIndex: featureIndex, function: 0x00, parameters: []),
-           response.payload.count >= 2,
-           let status = transport.request(featureIndex: featureIndex, function: 0x01, parameters: []),
-           status.payload.count >= 4 {
-            let exactPercent = status.payload[0]
-            let supportsStateOfCharge = (response.payload[1] & 0x02) != 0
-            if supportsStateOfCharge, (1 ... 100).contains(exactPercent) {
-                return Int(exactPercent)
-            }
-
-            return ApproximateBatteryLevel(rawValue: status.payload[1])?.percent
-        }
-
-        if let featureIndex = transport.featureIndex(for: .batteryVoltage),
-           let response = transport.request(featureIndex: featureIndex, function: 0x00, parameters: []),
-           response.payload.count >= 2 {
-            return estimateBatteryPercent(fromMillivolts: Int(response.payload[0]) << 8 | Int(response.payload[1]))
-        }
-
-        if let featureIndex = transport.featureIndex(for: .adcMeasurement),
-           let response = transport.request(featureIndex: featureIndex, function: 0x00, parameters: []),
-           response.payload.count >= 2 {
-            return estimateBatteryPercent(fromMillivolts: Int(response.payload[0]) << 8 | Int(response.payload[1]))
-        }
-
-        return nil
-    }
-
-    func readReceiverBatteryLevel(using transport: HIDPPTransport) -> Int? {
-        readBatteryLevel(using: transport)
-    }
-
-    private func estimateBatteryPercent(fromMillivolts millivolts: Int) -> Int {
-        let lowerBound = 3500
-        let upperBound = 4200
-        let clamped = max(lowerBound, min(upperBound, millivolts))
-        return Int(round(Double(clamped - lowerBound) / Double(upperBound - lowerBound) * 100))
-    }
-
-    private func isReceiverVendorChannel(_ device: VendorSpecificDeviceContext) -> Bool {
-        device.transport == PointerDeviceTransportName.usb
-            && device.primaryUsagePage == 0xFF00
-            && device.primaryUsage == 0x01
     }
 
     private func normalizeName(_ name: String) -> String {
@@ -1513,7 +1302,6 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
     private var requestStrategy: RequestStrategy?
     private var requestStrategyFailureCount = 0
     private let notificationBuffer = HIDPPNotificationBuffer()
-    private let reportObservers = HIDPPReportObservers()
     private let terminalAdmission = ReceiverChannelTerminalAdmission()
 
     /// Serial-backed receiver ownership survives the process. An unidentified
@@ -1548,17 +1336,6 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
             action
         )
         CFRunLoopWakeUp(runLoop)
-    }
-
-    /// Battery observation must share an existing transport, never open a
-    /// receiver independently of its lifecycle owner.
-    static func existingChannel(locationID: Int) -> LogitechReceiverChannel? {
-        let channel = sharedChannelsLock.withLock { sharedChannels[locationID]?.channel }
-        return channel?.isTransportActive == true ? channel : nil
-    }
-
-    func observeReports(_ callback: @escaping (Data) -> Void) -> ObservationToken {
-        reportObservers.observe(callback)
     }
 
     static func open(
@@ -2071,7 +1848,7 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
             .joined(separator: ", ")
 
         os_log(
-            "Receiver slot discovery started: locationID=%{public}@ connectedCount=%{public}@ snapshots=%{public}@",
+            "Receiver slot discovery started: locationID=%{private}@ connectedCount=%{private}@ snapshots=%{private}@",
             log: LogitechHIDPPDeviceMetadataProvider.log,
             type: .info,
             locationID.map(String.init) ?? "(nil)",
@@ -2103,25 +1880,23 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
             pairedSlots.append(slotInfo)
 
             os_log(
-                "Receiver slot %u raw candidate: name=%{public}@ kind=%{public}u battery=%{public}@",
+                "Receiver slot %u raw candidate: name=%{private}@ kind=%{private}u",
                 log: LogitechHIDPPDeviceMetadataProvider.log,
                 type: .info,
                 slot,
                 slotInfo.name ?? "(nil)",
-                UInt32(slotInfo.kind),
-                slotInfo.batteryLevel.map(String.init) ?? "(nil)"
+                UInt32(slotInfo.kind)
             )
         }
 
         let pairedSummary = pairedSlots.map { slot in
-            let battery = slot.batteryLevel.map(String.init) ?? "(nil)"
             let name = slot.name ?? "(nil)"
-            return "slot=\(slot.slot) kind=\(slot.kind) name=\(name) battery=\(battery)"
+            return "slot=\(slot.slot) kind=\(slot.kind) name=\(name)"
         }
         .joined(separator: ", ")
 
         os_log(
-            "Receiver slot metadata discovered: locationID=%{public}@ paired=%{public}u slots=%{public}@",
+            "Receiver slot metadata discovered: locationID=%{private}@ paired=%{private}u slots=%{private}@",
             log: LogitechHIDPPDeviceMetadataProvider.log,
             type: .info,
             locationID.map(String.init) ?? "(nil)",
@@ -2197,9 +1972,6 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
         let routedName = routedTransport.flatMap { transport in
             metadataProvider.readFriendlyName(using: transport) ?? metadataProvider.readName(using: transport)
         }
-        let batteryLevel = routedTransport.flatMap {
-            metadataProvider.readReceiverBatteryLevel(using: $0)
-        }
         let name = nameResponse.flatMap(Self.parseReceiverName) ?? routedName
         let productID = pairingResponse.flatMap(Self.parseReceiverProductID)
         let serialNumber = extendedPairingResponse.flatMap(Self.parseReceiverSerialNumber)
@@ -2210,8 +1982,7 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
             name: name,
             productID: productID,
             serialNumber: serialNumber,
-            batteryLevel: batteryLevel,
-            hasLiveMetadata: routedName != nil || batteryLevel != nil
+            hasLiveMetadata: routedName != nil
         )
     }
 
@@ -2245,7 +2016,6 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
             name: nil,
             productID: Self.parseReceiverProductID(pairingResponse),
             serialNumber: extendedPairingResponse.flatMap(Self.parseReceiverSerialNumber),
-            batteryLevel: nil,
             hasLiveMetadata: false
         )
     }
@@ -2307,7 +2077,6 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
 
         let slots = discovery.slots
 
-        let provider = LogitechHIDPPDeviceMetadataProvider()
         let candidates = slots.map { slot in
             LogitechHIDPPDeviceMetadataProvider.ReceiverSlotMatchCandidate(
                 slot: slot.slot,
@@ -2315,13 +2084,6 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
                 name: slot.name ?? baseName,
                 serialNumber: slot.serialNumber,
                 productID: slot.productID,
-                batteryLevel: slot.batteryLevel ?? HIDPPTransport(
-                    device: self,
-                    deviceIndex: slot.slot,
-                    requestTimeout: LogitechHIDPPDeviceMetadataProvider.Constants.receiverProbeTimeout,
-                    shouldContinue: shouldContinue
-                )
-                .flatMap { provider.readReceiverBatteryLevel(using: $0) },
                 hasLiveMetadata: slot.hasLiveMetadata
             )
         }
@@ -2358,7 +2120,7 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
         )
         if !enabled {
             os_log(
-                "Failed to enable receiver wireless notifications: locationID=%{public}@",
+                "Failed to enable receiver wireless notifications: locationID=%{private}@",
                 log: LogitechHIDPPDeviceMetadataProvider.log,
                 type: .info,
                 locationID.map(String.init) ?? "(nil)"
@@ -2403,7 +2165,7 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
             )
             if !restored {
                 os_log(
-                    "Failed to restore owned receiver notification flags: locationID=%{public}@",
+                    "Failed to restore owned receiver notification flags: locationID=%{private}@",
                     log: LogitechHIDPPDeviceMetadataProvider.log,
                     type: .error,
                     locationID.map(String.init) ?? "(nil)"
@@ -2477,8 +2239,7 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
                 kind: kind,
                 name: slot.name ?? baseName,
                 serialNumber: slot.serialNumber,
-                productID: slot.productID,
-                batteryLevel: slot.batteryLevel
+                productID: slot.productID
             )
         }
 
@@ -3043,7 +2804,6 @@ final class LogitechReceiverChannel: VendorSpecificDeviceContext, HIDPPCancellab
 
         pendingLock.unlock()
         semaphores.forEach { $0.signal() }
-        reportObservers.receive(report)
         if !wasClaimedByTransaction {
             notificationBuffer.appendIfUnsolicited(report)
         }
@@ -3503,8 +3263,7 @@ final class LogitechReprogrammableControlsMonitor {
             kind: device.category == .trackpad ? .touchpad : .mouse,
             name: device.productName ?? device.name,
             serialNumber: device.serialNumber,
-            productID: device.productID,
-            batteryLevel: device.batteryLevel
+            productID: device.productID
         )
     }
 
@@ -3644,7 +3403,7 @@ final class LogitechReprogrammableControlsMonitor {
                     }
                 )
                 os_log(
-                    "Retry Logitech controls monitor initialization because device is not ready: retryTimeout=%{public}.1f device=%{public}@",
+                    "Retry Logitech controls monitor initialization because device is not ready: retryTimeout=%{private}.1f device=%{private}@",
                     log: Self.log,
                     type: .info,
                     retryTimeout,
@@ -3749,7 +3508,7 @@ final class LogitechReprogrammableControlsMonitor {
                     }
                     finishVirtualButtonRecordingPreparationIfNeeded(sessionID: recordingSessionID)
                     os_log(
-                        "Pause Logitech control diversion until configuration changes: locationID=%{public}d slot=%{public}u device=%{public}@ recording=%{public}@",
+                        "Pause Logitech control diversion until configuration changes: locationID=%{private}d slot=%{private}u device=%{private}@ recording=%{private}@",
                         log: Self.log,
                         type: .info,
                         locationID,
@@ -3830,7 +3589,7 @@ final class LogitechReprogrammableControlsMonitor {
                     )
                     else {
                         os_log(
-                            "Failed to enable Logitech control diversion: locationID=%{public}d slot=%{public}u cid=0x%{public}04X",
+                            "Failed to enable Logitech control diversion: locationID=%{private}d slot=%{private}u cid=0x%{private}04X",
                             log: Self.log,
                             type: .error,
                             locationID,
@@ -3874,7 +3633,7 @@ final class LogitechReprogrammableControlsMonitor {
                     }
                     finishVirtualButtonRecordingPreparationIfNeeded(sessionID: recordingSessionID)
                     os_log(
-                        "Failed to enable any Logitech control diversion: locationID=%{public}d slot=%{public}u device=%{public}@",
+                        "Failed to enable any Logitech control diversion: locationID=%{private}d slot=%{private}u device=%{private}@",
                         log: Self.log,
                         type: .error,
                         locationID,
@@ -3946,7 +3705,7 @@ final class LogitechReprogrammableControlsMonitor {
                 .joined(separator: " | ")
 
                 os_log(
-                    "Logitech controls monitor enabled: locationID=%{public}d slot=%{public}u device=%{public}@ controls=%{public}@",
+                    "Logitech controls monitor enabled: locationID=%{private}d slot=%{private}u device=%{private}@ controls=%{private}@",
                     log: Self.log,
                     type: .info,
                     locationID,
@@ -4036,7 +3795,7 @@ final class LogitechReprogrammableControlsMonitor {
                     if reconfigResult.needed {
                         if reconfigResult.forced {
                             os_log(
-                                "Restart Logitech control monitor (forced, e.g. device reconnect): locationID=%{public}d slot=%{public}u device=%{public}@",
+                                "Restart Logitech control monitor (forced, e.g. device reconnect): locationID=%{private}d slot=%{private}u device=%{private}@",
                                 log: Self.log,
                                 type: .info,
                                 locationID,
@@ -4056,7 +3815,7 @@ final class LogitechReprogrammableControlsMonitor {
                             || newControlSnapshot.isRecording != isRecording
                             || newControlSnapshot.recordingSessionID != recordingSessionID {
                             os_log(
-                                "Restart Logitech control monitor to refresh diverted controls: locationID=%{public}d slot=%{public}u device=%{public}@",
+                                "Restart Logitech control monitor to refresh diverted controls: locationID=%{private}d slot=%{private}u device=%{private}@",
                                 log: Self.log,
                                 type: .info,
                                 locationID,
@@ -4088,7 +3847,7 @@ final class LogitechReprogrammableControlsMonitor {
                     for controlID in changedControls {
                         let isPressed = activeControls.contains(controlID)
                         os_log(
-                            "Logitech reprogrammable control event: locationID=%{public}d slot=%{public}u device=%{public}@ cid=0x%{public}04X button=%{public}d state=%{public}@ active=%{public}@",
+                            "Logitech reprogrammable control event: locationID=%{private}d slot=%{private}u device=%{private}@ cid=0x%{private}04X button=%{private}d state=%{private}@ active=%{private}@",
                             log: Self.log,
                             type: .info,
                             locationID,
@@ -4157,7 +3916,7 @@ final class LogitechReprogrammableControlsMonitor {
                         }
 
                         os_log(
-                            "Posting Logitech synthetic fallback: locationID=%{public}d slot=%{public}u device=%{public}@ cid=0x%{public}04X action=%{public}@ identityFallback=%{public}@",
+                            "Posting Logitech synthetic fallback: locationID=%{private}d slot=%{private}u device=%{private}@ cid=0x%{private}04X action=%{private}@ identityFallback=%{private}@",
                             log: Self.log,
                             type: .info,
                             locationID,
@@ -4326,8 +4085,7 @@ final class LogitechReprogrammableControlsMonitor {
             kind: .mouse,
             name: device.productName ?? device.name,
             serialNumber: device.serialNumber,
-            productID: device.productID,
-            batteryLevel: device.batteryLevel
+            productID: device.productID
         )
 
         return MonitorTarget(
@@ -4803,7 +4561,7 @@ final class LogitechReprogrammableControlsMonitor {
             && response.payload[1] == UInt8(controlID & 0xFF)
         if !didEchoControlID {
             os_log(
-                "Logitech setCidReporting did not echo control ID: cid=0x%{public}04X payload=%{public}@",
+                "Logitech setCidReporting did not echo control ID: cid=0x%{private}04X payload=%{private}@",
                 log: Self.log,
                 type: .info,
                 controlID,
@@ -4815,7 +4573,7 @@ final class LogitechReprogrammableControlsMonitor {
                 for: controlID, using: transport, featureIndex: featureIndex
             ) else {
                 os_log(
-                    "Logitech setCidReporting verification failed (read-back error): cid=0x%{public}04X",
+                    "Logitech setCidReporting verification failed (read-back error): cid=0x%{private}04X",
                     log: Self.log, type: .error, controlID
                 )
                 return false
@@ -4823,7 +4581,7 @@ final class LogitechReprogrammableControlsMonitor {
             let actuallyDiverted = verifyReporting.flags.contains(.diverted)
             guard actuallyDiverted == enabled else {
                 os_log(
-                    "Logitech setCidReporting verification mismatch: cid=0x%{public}04X wanted=%{public}@ actual=%{public}@",
+                    "Logitech setCidReporting verification mismatch: cid=0x%{private}04X wanted=%{private}@ actual=%{private}@",
                     log: Self.log, type: .error, controlID,
                     enabled ? "diverted" : "native",
                     actuallyDiverted ? "diverted" : "native"
@@ -4856,7 +4614,7 @@ final class LogitechReprogrammableControlsMonitor {
             }
 
             os_log(
-                "Logitech setCidReporting retry %{public}d/%{public}d: cid=0x%{public}04X",
+                "Logitech setCidReporting retry %{private}d/%{private}d: cid=0x%{private}04X",
                 log: Self.log, type: .info,
                 attempt, maxAttempts, controlID
             )
@@ -4879,7 +4637,7 @@ final class LogitechReprogrammableControlsMonitor {
 
             guard setDiverted(shouldBeDiverted, for: controlID, using: transport, featureIndex: featureIndex) else {
                 os_log(
-                    "%{public}s failed: locationID=%{public}d slot=%{public}u cid=0x%{public}04X target=%{public}@",
+                    "%{private}s failed: locationID=%{private}d slot=%{private}u cid=0x%{private}04X target=%{private}@",
                     log: Self.log,
                     type: .error,
                     String(describing: reason),
@@ -4898,7 +4656,7 @@ final class LogitechReprogrammableControlsMonitor {
                 featureIndex: featureIndex
             ) else {
                 os_log(
-                    "%{public}s verification failed: locationID=%{public}d slot=%{public}u cid=0x%{public}04X",
+                    "%{private}s verification failed: locationID=%{private}d slot=%{private}u cid=0x%{private}04X",
                     log: Self.log,
                     type: .error,
                     String(describing: reason),
@@ -4913,7 +4671,7 @@ final class LogitechReprogrammableControlsMonitor {
             let isDiverted = currentReportingInfo.flags.contains(.diverted)
             guard isDiverted == shouldBeDiverted else {
                 os_log(
-                    "%{public}s verification mismatch: locationID=%{public}d slot=%{public}u cid=0x%{public}04X target=%{public}@ actual=%{public}@ reporting=%{public}@",
+                    "%{private}s verification mismatch: locationID=%{private}d slot=%{private}u cid=0x%{private}04X target=%{private}@ actual=%{private}@ reporting=%{private}@",
                     log: Self.log,
                     type: .error,
                     String(describing: reason),
@@ -5074,7 +4832,7 @@ final class LogitechReprogrammableControlsMonitor {
         let controls = fetchControls(using: transport, featureIndex: featureIndex)
         guard !controls.isEmpty else {
             os_log(
-                "No Logitech reprogrammable controls discovered: locationID=%{public}d slot=%{public}u",
+                "No Logitech reprogrammable controls discovered: locationID=%{private}d slot=%{private}u",
                 log: Self.log,
                 type: .info,
                 locationID,
@@ -5100,7 +4858,7 @@ final class LogitechReprogrammableControlsMonitor {
         .joined(separator: " | ")
 
         os_log(
-            "Logitech REPROG_CONTROLS_V4 dump: locationID=%{public}d slot=%{public}u controls=%{public}@",
+            "Logitech REPROG_CONTROLS_V4 dump: locationID=%{private}d slot=%{private}u controls=%{private}@",
             log: Self.log,
             type: .info,
             locationID,

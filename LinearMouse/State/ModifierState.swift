@@ -41,7 +41,7 @@ final class ModifierState {
     }
 
     func update(with event: CGEvent) {
-        guard [.flagsChanged, .keyDown, .keyUp].contains(event.type),
+        guard event.type == .flagsChanged,
               !event.isLinearMouseSyntheticEvent else {
             return
         }

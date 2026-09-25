@@ -551,8 +551,7 @@ final class AdjustableDPITests: XCTestCase {
             kind: .mouse,
             name: name,
             serialNumber: serialNumber,
-            productID: productID,
-            batteryLevel: nil
+            productID: productID
         )
     }
 

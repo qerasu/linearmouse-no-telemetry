@@ -13,8 +13,6 @@ class EventType {
         .otherMouseDown,
         .otherMouseUp,
         .otherMouseDragged,
-        .keyDown,
-        .keyUp,
         .flagsChanged
     ]
 

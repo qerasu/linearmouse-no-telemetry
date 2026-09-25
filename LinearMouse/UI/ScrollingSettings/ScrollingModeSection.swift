@@ -35,14 +35,6 @@ extension ScrollingSettings {
                                 .fixedSize(horizontal: false, vertical: true)
 
                                 HStack(alignment: .firstTextBaseline) {
-                                    HyperLink(
-                                        URL(
-                                            string: "https://github.com/linearmouse/linearmouse/issues/1180#issuecomment-4461761262"
-                                        )!
-                                    ) {
-                                        Text("Learn more")
-                                    }
-
                                     Spacer()
 
                                     Button("Enable") {

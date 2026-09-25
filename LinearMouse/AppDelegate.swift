@@ -1,9 +1,7 @@
 // MIT License
 // Copyright (c) 2021-2026 LinearMouse
 
-import AppMover
 import Combine
-import LaunchAtLogin
 import os.log
 import SwiftUI
 
@@ -34,21 +32,12 @@ struct AppLifecycleAdmission {
 class AppDelegate: NSObject, NSApplicationDelegate {
     private static let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "AppDelegate")
 
-    private let autoUpdateManager = AutoUpdateManager.shared
     private let statusItem = StatusItem.shared
     private var subscriptions = Set<AnyCancellable>()
     private var lifecycleAdmission = AppLifecycleAdmission()
     private var lifecycleReady = false
     private var workspaceNotificationObservers = [NSObjectProtocol]()
     private var terminationRequest: BoundedCleanupRequest?
-
-    /// Runs the one-time legacy -> SMAppService login-item migration on launch.
-    ///
-    /// It's a no-op below macOS 13 and after the first successful run. This call
-    /// was lost in 5437d88 and is restored here (issue #1328).
-    override init() {
-        LaunchAtLogin.migrateIfNeeded()
-    }
 
     func applicationWillFinishLaunching(_: Notification) {
         guard ProcessEnvironment.isRunningApp else {
@@ -62,12 +51,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard ProcessEnvironment.isRunningApp else {
             return
         }
-
-        #if !DEBUG
-            if AppMover.moveIfNecessary() {
-                return
-            }
-        #endif
 
         guard AccessibilityPermission.enabled else {
             AccessibilityPermissionWindow.shared.bringToFront()
@@ -131,9 +114,17 @@ extension AppDelegate {
         setupConfiguration()
         setupNotifications()
         KeyboardSettingsSnapshot.shared.refresh()
-        ModifierActionsTransformer.zoomShortcutResolver.refresh()
         lifecycleReady = true
         startIfAllowed()
+    }
+
+    func resumeAfterAccessibilityPermissionGranted() {
+        guard !lifecycleReady else {
+            return
+        }
+
+        setup()
+        SettingsWindowController.shared.bringToFront()
     }
 
     func setupConfiguration() {
@@ -168,7 +159,6 @@ extension AppDelegate {
             os_log("Session active", log: Self.log, type: .info)
             self?.lifecycleAdmission.sessionActive = true
             KeyboardSettingsSnapshot.shared.refresh()
-            ModifierActionsTransformer.zoomShortcutResolver.refresh()
             self?.reconcileLifecycle()
         })
 
@@ -210,7 +200,6 @@ extension AppDelegate {
         case .running:
             activateRunningLifecycle()
         case .suspended:
-            BatteryDeviceMonitor.shared.disable()
             GlobalEventTap.shared.stop()
             DeviceManager.shared.suspendForSleep()
         case .stopped:
@@ -231,7 +220,6 @@ extension AppDelegate {
 
     func start() {
         DeviceManager.shared.start()
-        BatteryDeviceMonitor.shared.enable()
         GlobalEventTap.shared.start()
     }
 
@@ -239,7 +227,6 @@ extension AppDelegate {
         logitechTeardownPolicy: DeviceManagerLogitechTeardownPolicy = .restore,
         completion: (() -> Void)? = nil
     ) {
-        BatteryDeviceMonitor.shared.disable()
         GlobalEventTap.shared.stop()
         DeviceManager.shared.stop(
             logitechTeardownPolicy: logitechTeardownPolicy,

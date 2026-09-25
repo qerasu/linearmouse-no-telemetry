@@ -21,14 +21,7 @@ public protocol KeySimulating: AnyObject {
         restoringModifierFlags: CGEventFlags,
         tap: CGEventTapLocation?
     ) throws
-    func press(
-        keyCode: CGKeyCode,
-        modifierFlags: CGEventFlags,
-        restoringModifierFlags: CGEventFlags,
-        tap: CGEventTapLocation?
-    ) throws
     func reset()
-    func modifiedCGEventFlags(of event: CGEvent) -> CGEventFlags?
 }
 
 /// Simulate key presses.
@@ -161,7 +154,7 @@ public class KeySimulator: KeySimulating {
                     tap: tap
                 )
             } catch {
-                os_log(.error, "KeySimulator: keyDown failed for %{public}@: %{public}@", "\(key)", "\(error)")
+                os_log(.error, "KeySimulator: keyDown failed for %{private}@: %{private}@", "\(key)", "\(error)")
             }
         }
         for key in keys.reversed() {
@@ -173,7 +166,7 @@ public class KeySimulator: KeySimulating {
                     tap: tap
                 )
             } catch {
-                os_log(.error, "KeySimulator: keyUp failed for %{public}@: %{public}@", "\(key)", "\(error)")
+                os_log(.error, "KeySimulator: keyUp failed for %{private}@: %{private}@", "\(key)", "\(error)")
             }
         }
 
@@ -185,7 +178,7 @@ public class KeySimulator: KeySimulating {
                     tap: tap
                 )
             } catch {
-                os_log(.error, "KeySimulator: restoring modifier flags failed: %{public}@", "\(error)")
+                os_log(.error, "KeySimulator: restoring modifier flags failed: %{private}@", "\(error)")
             }
         }
     }
@@ -199,18 +192,16 @@ public class KeySimulator: KeySimulating {
         let simulatedGenericFlags = simulatedModifierFlags.intersection(Self.genericModifierFlags)
         let genericFlagsToRestore = restoringGenericFlags.subtracting(simulatedGenericFlags)
 
-        let genericFlagsToRelease = simulatedGenericFlags.subtracting(restoringGenericFlags)
-        let isRestoring = !genericFlagsToRestore.isEmpty
-        guard isRestoring || !genericFlagsToRelease.isEmpty,
+        guard !genericFlagsToRestore.isEmpty,
               let key = Self.modifierKey(
-                  in: isRestoring ? restoringModifierFlags : simulatedModifierFlags,
-                  matching: isRestoring ? genericFlagsToRestore : genericFlagsToRelease
+                  in: restoringModifierFlags,
+                  matching: genericFlagsToRestore
               ),
               let keyCode = keyCodeResolver.keyCode(for: key) else {
             return
         }
 
-        guard let event = CGEvent.makeHardwareLikeKeyEvent(virtualKey: keyCode, keyDown: isRestoring) else {
+        guard let event = CGEvent.makeHardwareLikeKeyEvent(virtualKey: keyCode, keyDown: true) else {
             return
         }
 
@@ -334,43 +325,4 @@ public extension KeySimulator {
         }
     }
 
-    func modifiedCGEventFlags(of event: CGEvent) -> CGEventFlags? {
-        lock.withLock {
-            guard !flags.isEmpty else {
-                return nil
-            }
-
-            guard event.type == .keyDown || event.type == .keyUp else {
-                return nil
-            }
-
-            return event.flags.union(flags)
-        }
-    }
-
-    /// Sends a resolved physical shortcut without translating its key code through the layout again.
-    func press(
-        keyCode: CGKeyCode,
-        modifierFlags: CGEventFlags,
-        restoringModifierFlags: CGEventFlags,
-        tap: CGEventTapLocation? = nil
-    ) throws {
-        try lock.withLock {
-            for keyDown in [true, false] {
-                guard let event = CGEvent.makeHardwareLikeKeyEvent(virtualKey: keyCode, keyDown: keyDown) else {
-                    continue
-                }
-                event.flags = Self.replacingKeyboardModifierFlags(in: event.flags, with: modifierFlags)
-                if let eventSourceUserData {
-                    event.setIntegerValueField(.eventSourceUserData, value: eventSourceUserData)
-                }
-                eventPoster(event, tap)
-            }
-            try restoreModifierFlagsLocked(
-                restoringModifierFlags,
-                afterUsing: modifierFlags,
-                tap: tap
-            )
-        }
-    }
 }

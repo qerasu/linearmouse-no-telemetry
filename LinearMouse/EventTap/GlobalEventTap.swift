@@ -19,7 +19,6 @@ class GlobalEventTap {
     init() {}
 
     private func callback(_ event: CGEvent) -> CGEvent? {
-        PointerLocationTriggerController.shared.handle(event)
         ModifierState.shared.update(with: event)
 
         let mouseEventView = MouseEventView(event)
@@ -127,7 +126,7 @@ class GlobalEventTap {
             return
         }
 
-        os_log("Restart GlobalEventTap: %{public}@", log: Self.log, type: .info, String(describing: reason))
+        os_log("Restart GlobalEventTap: %{private}@", log: Self.log, type: .info, String(describing: reason))
         stopObservation()
         startObservation()
     }

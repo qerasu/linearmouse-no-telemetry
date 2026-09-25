@@ -2,11 +2,8 @@
 // Copyright (c) 2021-2026 LinearMouse
 
 import AppKit
-import os.log
 
 class GlobalEventTapWatchdog {
-    private static let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "GlobalEventTapWatchdog")
-
     init() {}
 
     deinit {
@@ -37,7 +34,7 @@ class GlobalEventTapWatchdog {
             }.removeLifetime()
         } catch {
             stop()
-            Application.restart()
+            NSApplication.shared.terminate(nil)
         }
     }
 }

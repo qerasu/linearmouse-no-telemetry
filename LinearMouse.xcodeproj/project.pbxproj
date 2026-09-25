@@ -15,11 +15,7 @@
 		97A7A39C28587E8C00EE4833 /* PointerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 97A7A39B28587E8C00EE4833 /* PointerKit */; };
 		97C5D8FF2856E3CB00CBED2D /* GestureKit in Frameworks */ = {isa = PBXBuildFile; productRef = 97C5D8FE2856E3CB00CBED2D /* GestureKit */; };
 		97C97728288FC49F009094BA /* DockKit in Frameworks */ = {isa = PBXBuildFile; productRef = 97C97727288FC49F009094BA /* DockKit */; };
-		97FC692F29F44D0100859859 /* AppMover in Frameworks */ = {isa = PBXBuildFile; productRef = 97FC692E29F44D0100859859 /* AppMover */; };
-		97FD5B552CCDF2A600125BFE /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 97FD5B542CCDF2A600125BFE /* Sparkle */; };
 		D2D2D2D2D2D2D2D2D2D2D2D2 /* HIDPP in Frameworks */ = {isa = PBXBuildFile; productRef = D1D1D1D1D1D1D1D1D1D1D1D1 /* HIDPP */; };
-		B70A58F6284F987900E5C86E /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = B70A58F5284F987900E5C86E /* LaunchAtLogin */; };
-		B73AC55127C29C7C00F7D3E8 /* Version in Frameworks */ = {isa = PBXBuildFile; productRef = B73AC55027C29C7C00F7D3E8 /* Version */; };
 		B7F6C5F827A4F6A800E5400B /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = B7F6C5F727A4F6A800E5400B /* LRUCache */; };
 /* End PBXBuildFile section */
 
@@ -64,16 +60,12 @@
 			files = (
 				977638F9286BE9EE00A698B6 /* PublishedObject in Frameworks */,
 				978DBCA629AB1732002259B3 /* JSONPatcher in Frameworks */,
-				B70A58F6284F987900E5C86E /* LaunchAtLogin in Frameworks */,
 				9724FACA2A3E04DE00622F5A /* KeyKit in Frameworks */,
 				97C97728288FC49F009094BA /* DockKit in Frameworks */,
-				97FD5B552CCDF2A600125BFE /* Sparkle in Frameworks */,
-				97FC692F29F44D0100859859 /* AppMover in Frameworks */,
 				972A5E30285D891100CB6440 /* Defaults in Frameworks */,
 				97A7A39C28587E8C00EE4833 /* PointerKit in Frameworks */,
 				D2D2D2D2D2D2D2D2D2D2D2D2 /* HIDPP in Frameworks */,
 				97C5D8FF2856E3CB00CBED2D /* GestureKit in Frameworks */,
-				B73AC55127C29C7C00F7D3E8 /* Version in Frameworks */,
 				975979DB2A6BA1A700016EDF /* ObservationToken in Frameworks */,
 				B7F6C5F827A4F6A800E5400B /* LRUCache in Frameworks */,
 			);
@@ -131,7 +123,6 @@
 				B75A06142671E9D800BEAF77 /* Sources */,
 				B75A06152671E9D800BEAF77 /* Frameworks */,
 				B75A06162671E9D800BEAF77 /* Resources */,
-				B70A58F7284F988B00E5C86E /* Copy “Launch at Login Helper” */,
 			);
 			buildRules = (
 			);
@@ -143,8 +134,6 @@
 			name = LinearMouse;
 			packageProductDependencies = (
 				B7F6C5F727A4F6A800E5400B /* LRUCache */,
-				B73AC55027C29C7C00F7D3E8 /* Version */,
-				B70A58F5284F987900E5C86E /* LaunchAtLogin */,
 				97C5D8FE2856E3CB00CBED2D /* GestureKit */,
 				97A7A39B28587E8C00EE4833 /* PointerKit */,
 				D1D1D1D1D1D1D1D1D1D1D1D1 /* HIDPP */,
@@ -152,10 +141,8 @@
 				977638F8286BE9EE00A698B6 /* PublishedObject */,
 				97C97727288FC49F009094BA /* DockKit */,
 				978DBCA529AB1732002259B3 /* JSONPatcher */,
-				97FC692E29F44D0100859859 /* AppMover */,
 				9724FAC92A3E04DE00622F5A /* KeyKit */,
 				975979DA2A6BA1A700016EDF /* ObservationToken */,
-				97FD5B542CCDF2A600125BFE /* Sparkle */,
 			);
 			productName = LinearMouse;
 			productReference = B75A06182671E9D800BEAF77 /* LinearMouse.app */;
@@ -207,49 +194,13 @@
 			knownRegions = (
 				en,
 				Base,
-				"zh-Hans",
-				"zh-Hant",
-				ru,
-				de,
-				af,
-				hu,
-				ko,
-				it,
-				"nb-NO",
-				ro,
-				cs,
-				el,
-				es,
-				pt,
-				da,
-				vi,
-				ja,
-				ca,
-				pl,
-				"pt-BR",
-				uk,
-				he,
-				sr,
-				tr,
-				ar,
-				sv,
-				fi,
-				fr,
-				nl,
-				sk,
-				my,
-				"zh-Hant-HK",
 			);
 			mainGroup = B75A060F2671E9D800BEAF77;
 			packageReferences = (
-				B784292B278DB06600D207F0 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				B7F6C5F627A4F6A800E5400B /* XCRemoteSwiftPackageReference "LRUCache" */,
-				B73AC54F27C29C7C00F7D3E8 /* XCRemoteSwiftPackageReference "Version" */,
-				B70A58F4284F987900E5C86E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
 				972A5E2E285D891100CB6440 /* XCRemoteSwiftPackageReference "Defaults" */,
 				977638F7286BE9EE00A698B6 /* XCRemoteSwiftPackageReference "PublishedObject" */,
 				978DBCA429AB1732002259B3 /* XCRemoteSwiftPackageReference "JSONPatcher" */,
-				97FC692B29F44CE000859859 /* XCRemoteSwiftPackageReference "AppMover" */,
 			);
 			productRefGroup = B75A06192671E9D800BEAF77 /* Products */;
 			projectDirPath = "";
@@ -277,27 +228,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		B70A58F7284F988B00E5C86E /* Copy “Launch at Login Helper” */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy “Launch at Login Helper”";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-			shellPath = /bin/sh;
-			shellScript = "\"${BUILT_PRODUCTS_DIR}/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/copy-helper-swiftpm.sh\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B75A06142671E9D800BEAF77 /* Sources */ = {
@@ -453,7 +383,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LinearMouse/LinearMouse.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -476,7 +405,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LinearMouse/LinearMouse.entitlements;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -508,7 +437,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lujjjh.LinearMouseUnitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -531,7 +460,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lujjjh.LinearMouseUnitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -578,64 +507,32 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/Defaults";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = revision;
+				revision = 8584d1d6ed36c195258977f2ed0cf95357efb160;
 			};
 		};
 		977638F7286BE9EE00A698B6 /* XCRemoteSwiftPackageReference "PublishedObject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Amzd/PublishedObject";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.0;
+				kind = revision;
+				revision = e61bfde22832ba8dfe9f8be2561838a1512e38af;
 			};
 		};
 		978DBCA429AB1732002259B3 /* XCRemoteSwiftPackageReference "JSONPatcher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/linearmouse/JSONPatcher.git";
 			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		97FC692B29F44CE000859859 /* XCRemoteSwiftPackageReference "AppMover" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/linearmouse/AppMover";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		B70A58F4284F987900E5C86E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.0;
-			};
-		};
-		B73AC54F27C29C7C00F7D3E8 /* XCRemoteSwiftPackageReference "Version" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mrackwitz/Version.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.8.0;
-			};
-		};
-		B784292B278DB06600D207F0 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/lujjjh/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
+				kind = revision;
+				revision = fef582b56aff502305e4dbcfabf76cb57b5d4e15;
 			};
 		};
 		B7F6C5F627A4F6A800E5400B /* XCRemoteSwiftPackageReference "LRUCache" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/nicklockwood/LRUCache.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				kind = revision;
+				revision = 6d2b5246c9c98dcd498552bb22f08d55b12a8371;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -679,26 +576,6 @@
 		97C97727288FC49F009094BA /* DockKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DockKit;
-		};
-		97FC692E29F44D0100859859 /* AppMover */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 97FC692B29F44CE000859859 /* XCRemoteSwiftPackageReference "AppMover" */;
-			productName = AppMover;
-		};
-		97FD5B542CCDF2A600125BFE /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B784292B278DB06600D207F0 /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
-		};
-		B70A58F5284F987900E5C86E /* LaunchAtLogin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B70A58F4284F987900E5C86E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
-			productName = LaunchAtLogin;
-		};
-		B73AC55027C29C7C00F7D3E8 /* Version */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B73AC54F27C29C7C00F7D3E8 /* XCRemoteSwiftPackageReference "Version" */;
-			productName = Version;
 		};
 		B7F6C5F727A4F6A800E5400B /* LRUCache */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -173,7 +173,7 @@ class DeviceManager: ObservableObject {
         ] {
             manager
                 .observePropertyChanged(property: property) { [self] _ in
-                    os_log("Property %{public}@ changed", log: Self.log, type: .info, property)
+                    os_log("Property %{private}@ changed", log: Self.log, type: .info, property)
                     updatePointerSpeed()
                 }
                 .tieToLifetime(of: self)
@@ -528,7 +528,7 @@ class DeviceManager: ObservableObject {
         for device in logitechDevices
             where shouldMonitorReceiver(device) && device.pointerDevice.locationID == nil {
             os_log(
-                "Skip terminal Logitech receiver restore without a locationID: device=%{public}@",
+                "Skip terminal Logitech receiver restore without a locationID: device=%{private}@",
                 log: Self.log,
                 type: .error,
                 String(describing: device)
@@ -617,7 +617,7 @@ class DeviceManager: ObservableObject {
         for (locationID, devices) in receiverDevicesByLocation
             where !preparedReceiverLocations.contains(locationID) {
             os_log(
-                "Skip terminal Logitech device restore because no exact receiver channel is available: locationID=%{public}d",
+                "Skip terminal Logitech device restore because no exact receiver channel is available: locationID=%{private}d",
                 log: Self.log,
                 type: .error,
                 locationID
@@ -672,7 +672,7 @@ class DeviceManager: ObservableObject {
         ) { restored in
             if !restored, authorization.shouldContinue, Date() < deadline {
                 os_log(
-                    "Failed to restore all Logitech settings before teardown: device=%{public}@",
+                    "Failed to restore all Logitech settings before teardown: device=%{private}@",
                     log: Self.log,
                     type: .error,
                     String(describing: device)
@@ -786,7 +786,7 @@ class DeviceManager: ObservableObject {
         ) { [weak self] notification in
             let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
             os_log(
-                "Frontmost app changed: %{public}@",
+                "Frontmost app changed: %{private}@",
                 log: Self.log,
                 type: .info,
                 application?.bundleIdentifier ?? "(nil)"
@@ -801,7 +801,7 @@ class DeviceManager: ObservableObject {
     private func deviceAdded(_: PointerDeviceManager, _ pointerDevice: PointerDevice) {
         guard state.allowsDeviceTopology else {
             os_log(
-                "Drop device added while lifecycle does not admit device work: %{public}@",
+                "Drop device added while lifecycle does not admit device work: %{private}@",
                 log: Self.log,
                 type: .info,
                 String(describing: pointerDevice)
@@ -817,7 +817,7 @@ class DeviceManager: ObservableObject {
         refreshVisibleDevices()
 
         os_log(
-            "Device added: %{public}@",
+            "Device added: %{private}@",
             log: Self.log,
             type: .info,
             String(describing: device)
@@ -871,7 +871,7 @@ class DeviceManager: ObservableObject {
 
             if hasRemainingReceiverAtLocation {
                 os_log(
-                    "Keep receiver monitor running because another receiver device shares locationID=%{public}d",
+                    "Keep receiver monitor running because another receiver device shares locationID=%{private}d",
                     log: Self.log,
                     type: .info,
                     locationID
@@ -888,7 +888,7 @@ class DeviceManager: ObservableObject {
         refreshVisibleDevices()
 
         os_log(
-            "Device removed: %{public}@",
+            "Device removed: %{private}@",
             log: Self.log,
             type: .info,
             String(describing: device)
@@ -1095,7 +1095,7 @@ class DeviceManager: ObservableObject {
         lastActiveDeviceRef = .init(device)
 
         os_log(
-            "Last active device changed: %{public}@, category=%{public}@ (Reason: %{public}@)",
+            "Last active device changed: %{private}@, category=%{private}@ (Reason: %{private}@)",
             log: Self.log,
             type: .info,
             String(describing: device),
@@ -1206,7 +1206,7 @@ class DeviceManager: ObservableObject {
         guard state.allowsDeviceTopology,
               pointerDeviceToDevice.values.contains(where: { $0.pointerDevice.locationID == locationID }) else {
             os_log(
-                "Drop receiver logical device update because no visible device matches locationID=%{public}d count=%{public}u",
+                "Drop receiver logical device update because no visible device matches locationID=%{private}d count=%{private}u",
                 log: Self.log,
                 type: .info,
                 locationID,
@@ -1225,13 +1225,12 @@ class DeviceManager: ObservableObject {
         }
 
         let identitiesDescription = identities.map { identity in
-            let battery = identity.batteryLevel.map(String.init) ?? "(nil)"
-            return "slot=\(identity.slot) name=\(identity.name) battery=\(battery)"
+            "slot=\(identity.slot) name=\(identity.name)"
         }
         .joined(separator: ", ")
 
         os_log(
-            "Receiver logical devices updated for locationID=%{public}d: %{public}@",
+            "Receiver logical devices updated for locationID=%{private}d: %{private}@",
             log: Self.log,
             type: .info,
             locationID,

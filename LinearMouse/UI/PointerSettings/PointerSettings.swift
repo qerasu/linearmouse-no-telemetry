@@ -11,15 +11,8 @@ struct PointerSettings: View {
         DetailView {
             Form {
                 Section {
-                    HStack(spacing: 15) {
-                        Toggle(isOn: $state.pointerDisableAcceleration.animation()) {
-                            Text("Disable pointer acceleration")
-                        }
-
-                        HelpButton {
-                            NSWorkspace.shared
-                                .open(URL(string: "https://go.linearmouse.app/disable-pointer-acceleration-and-speed")!)
-                        }
+                    Toggle(isOn: $state.pointerDisableAcceleration.animation()) {
+                        Text("Disable pointer acceleration")
                     }
 
                     HStack(spacing: 15) {
@@ -73,20 +66,10 @@ struct PointerSettings: View {
                                                 isPresented: $isPointerSpeedLimitationPopoverPresented,
                                                 arrowEdge: .top
                                             ) {
-                                                VStack(alignment: .leading, spacing: 10) {
-                                                    Text(
-                                                        "Due to system limitations, this device may not support adjusting Pointer Speed on newer versions of macOS."
-                                                    )
-                                                    .fixedSize(horizontal: false, vertical: true)
-
-                                                    HyperLink(
-                                                        URL(
-                                                            string: "https://go.linearmouse.app/pointer-speed-limitations"
-                                                        )!
-                                                    ) {
-                                                        Text("Learn more")
-                                                    }
-                                                }
+                                                Text(
+                                                    "Due to system limitations, this device may not support adjusting Pointer Speed on newer versions of macOS."
+                                                )
+                                                .fixedSize(horizontal: false, vertical: true)
                                                 .padding()
                                                 .frame(width: 280, alignment: .leading)
                                             }

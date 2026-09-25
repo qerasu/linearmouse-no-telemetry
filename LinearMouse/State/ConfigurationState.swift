@@ -58,12 +58,6 @@ class ConfigurationState: ObservableObject {
                     return
                 }
 
-                os_log(
-                    "Saving new configuration: %{public}@",
-                    log: Self.log,
-                    type: .info,
-                    String(describing: self.configuration)
-                )
                 self.save()
             }
         }

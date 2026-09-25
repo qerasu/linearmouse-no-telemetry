@@ -303,7 +303,7 @@ final class ReceiverMonitor {
             context.requestRediscovery(request)
         }
 
-        os_log("Started receiver monitor for %{public}@", log: Self.log, type: .info, String(describing: device))
+        os_log("Started receiver monitor for %{private}@", log: Self.log, type: .info, String(describing: device))
     }
 
     func stopMonitoring(device: Device) {
@@ -686,7 +686,7 @@ private final class ReceiverContext {
             guard let receiverChannel = currentChannelSnapshot() else {
                 if !hasLoggedMissingChannel {
                     os_log(
-                        "Receiver channel is unavailable, will retry briefly: locationID=%{public}d device=%{public}@",
+                        "Receiver channel is unavailable, will retry briefly: locationID=%{private}d device=%{private}@",
                         log: ReceiverMonitor.log,
                         type: .info,
                         locationID,
@@ -727,7 +727,7 @@ private final class ReceiverContext {
                 }
                 if !probe.value {
                     os_log(
-                        "Lightspeed receiver did not respond to the HID++ capability probe, retrying: locationID=%{public}d device=%{public}@",
+                        "Lightspeed receiver did not respond to the HID++ capability probe, retrying: locationID=%{private}d device=%{private}@",
                         log: ReceiverMonitor.log,
                         type: .info,
                         locationID,
@@ -787,7 +787,7 @@ private final class ReceiverContext {
                         lastCompleteConnectedDeviceCount = nil
                     }
                     os_log(
-                        "Receiver inventory is incomplete, retrying: locationID=%{public}d device=%{public}@",
+                        "Receiver inventory is incomplete, retrying: locationID=%{private}d device=%{private}@",
                         log: ReceiverMonitor.log,
                         type: .info,
                         locationID,
@@ -795,7 +795,7 @@ private final class ReceiverContext {
                     )
                     if !hasPublishedInitialState, Date() >= initialDeadline {
                         os_log(
-                            "Receiver logical discovery timed out; background retries will continue: locationID=%{public}d device=%{public}@",
+                            "Receiver logical discovery timed out; background retries will continue: locationID=%{private}d device=%{private}@",
                             log: ReceiverMonitor.log,
                             type: .info,
                             locationID,
@@ -828,13 +828,12 @@ private final class ReceiverContext {
                 let completedRediscovery = rediscoveryInProgress
                 rediscoveryInProgress = nil
                 let identitiesDescription = identities.map { identity in
-                    let battery = identity.batteryLevel.map(String.init) ?? "(nil)"
-                    return "slot=\(identity.slot) name=\(identity.name) battery=\(battery)"
+                    "slot=\(identity.slot) name=\(identity.name)"
                 }
                 .joined(separator: ", ")
 
                 os_log(
-                    "Receiver initial discovery completed: locationID=%{public}d count=%{public}u identities=%{public}@",
+                    "Receiver initial discovery completed: locationID=%{private}d count=%{private}u identities=%{private}@",
                     log: ReceiverMonitor.log,
                     type: .info,
                     locationID,
@@ -887,7 +886,7 @@ private final class ReceiverContext {
                 }
                 if !reachability.value {
                     os_log(
-                        "Receiver channel appears dead, will reopen: locationID=%{public}d device=%{public}@",
+                        "Receiver channel appears dead, will reopen: locationID=%{private}d device=%{private}@",
                         log: ReceiverMonitor.log,
                         type: .info,
                         locationID,
@@ -968,7 +967,7 @@ private final class ReceiverContext {
                 .joined(separator: ", ")
 
             os_log(
-                "Receiver connection change detected: locationID=%{public}d device=%{public}@ snapshots=%{public}@",
+                "Receiver connection change detected: locationID=%{private}d device=%{private}@ snapshots=%{private}@",
                 log: ReceiverMonitor.log,
                 type: .info,
                 locationID,
@@ -1004,13 +1003,12 @@ private final class ReceiverContext {
         lastPublishedIdentities = identities
 
         let identitiesDescription = identities.map { identity in
-            let battery = identity.batteryLevel.map(String.init) ?? "(nil)"
-            return "slot=\(identity.slot) name=\(identity.name) battery=\(battery)"
+            "slot=\(identity.slot) name=\(identity.name)"
         }
         .joined(separator: ", ")
 
         os_log(
-            "Receiver logical discovery updated: locationID=%{public}d identities=%{public}@",
+            "Receiver logical discovery updated: locationID=%{private}d identities=%{private}@",
             log: ReceiverMonitor.log,
             type: .info,
             locationID,
@@ -1181,13 +1179,12 @@ private final class ReceiverContext {
         stateStore.updateSlotIdentity(identity)
 
         os_log(
-            "Refreshed slot identity: locationID=%{public}d slot=%{public}u name=%{public}@ battery=%{public}@",
+            "Refreshed slot identity: locationID=%{private}d slot=%{private}u name=%{private}@",
             log: ReceiverMonitor.log,
             type: .info,
             locationID,
             slot,
-            identity.name,
-            identity.batteryLevel.map(String.init) ?? "(nil)"
+            identity.name
         )
         return true
     }

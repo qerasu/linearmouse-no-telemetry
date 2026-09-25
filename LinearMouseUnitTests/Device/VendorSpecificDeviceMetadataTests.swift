@@ -13,64 +13,6 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
         var isValid = true
     }
 
-    func testMatcherMatchesVendorAndTransport() {
-        let matcher = VendorSpecificDeviceMatcher(
-            vendorID: 0x046D,
-            productIDs: [0xB015],
-            transports: [PointerDeviceTransportName.bluetoothLowEnergy]
-        )
-
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xB015,
-            transport: PointerDeviceTransportName.bluetoothLowEnergy
-        )
-
-        XCTAssertTrue(matcher.matches(device: device))
-    }
-
-    func testMatcherRejectsUnknownTransport() {
-        let matcher = VendorSpecificDeviceMatcher(
-            vendorID: 0x046D,
-            productIDs: nil,
-            transports: [PointerDeviceTransportName.usb]
-        )
-
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xB015,
-            transport: PointerDeviceTransportName.bluetoothLowEnergy
-        )
-
-        XCTAssertFalse(matcher.matches(device: device))
-    }
-
-    func testLogitechProviderMatchesBluetoothLowEnergyDeviceShape() {
-        let provider = LogitechHIDPPDeviceMetadataProvider()
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xB015,
-            transport: PointerDeviceTransportName.bluetoothLowEnergy,
-            maxInputReportSize: 20,
-            maxOutputReportSize: 20
-        )
-
-        XCTAssertTrue(provider.matches(device: device))
-    }
-
-    func testLogitechProviderMatchesUsbLogitechDeviceShape() {
-        let provider = LogitechHIDPPDeviceMetadataProvider()
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xB015,
-            transport: PointerDeviceTransportName.usb,
-            maxInputReportSize: 20,
-            maxOutputReportSize: 20
-        )
-
-        XCTAssertTrue(provider.matches(device: device))
-    }
-
     func testLogitechReceiverMonitoringAllowsSupportedUnifyingReceiverProductIDs() {
         XCTAssertTrue(
             LogitechHIDPPDeviceMetadataProvider.supportsReceiverMonitoring(
@@ -180,81 +122,6 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
                 productID: 0xB015
             )
         )
-    }
-
-    func testConnectedLogitechInventoryDoesNotQueryBluetoothLowEnergyDevices() {
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xB015,
-            product: "Logi M650",
-            name: "Logi M650",
-            transport: PointerDeviceTransportName.bluetoothLowEnergy,
-            maxInputReportSize: 20,
-            maxOutputReportSize: 20
-        )
-
-        let devices = ConnectedLogitechDeviceInventory.devices(from: [device])
-
-        XCTAssertTrue(devices.isEmpty)
-        XCTAssertEqual(device.outputReportRequestCount, 0)
-    }
-
-    func testConnectedLogitechInventoryDoesNotQueryKnownUsbReceivers() {
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xC52F,
-            product: "Logitech USB Device",
-            name: "Logitech USB Device",
-            transport: PointerDeviceTransportName.usb,
-            maxInputReportSize: 20,
-            maxOutputReportSize: 20
-        )
-
-        let devices = ConnectedLogitechDeviceInventory.devices(from: [device])
-
-        XCTAssertTrue(devices.isEmpty)
-        XCTAssertEqual(device.outputReportRequestCount, 0)
-    }
-
-    func testConnectedLogitechInventoryDoesNotIssueHIDIOAfterDeadline() {
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xB015,
-            product: "Logitech USB Device",
-            name: "Logitech USB Device",
-            transport: PointerDeviceTransportName.usb,
-            locationID: 1,
-            maxInputReportSize: 20,
-            maxOutputReportSize: 20
-        )
-
-        let devices = ConnectedLogitechDeviceInventory.devices(
-            from: [device],
-            deadline: Date(timeIntervalSince1970: 0)
-        )
-
-        XCTAssertTrue(devices.isEmpty)
-        XCTAssertEqual(device.outputReportRequestCount, 0)
-        XCTAssertEqual(device.outputReportRequestOnceCount, 0)
-    }
-
-    func testConnectedLogitechInventoryDoesNotIssueHIDIOAfterCancellation() {
-        let device = MockVendorSpecificDeviceContext(
-            vendorID: 0x046D,
-            productID: 0xB015,
-            product: "Logitech USB Device",
-            name: "Logitech USB Device",
-            transport: PointerDeviceTransportName.usb,
-            locationID: 1,
-            maxInputReportSize: 20,
-            maxOutputReportSize: 20
-        )
-
-        let devices = ConnectedLogitechDeviceInventory.devices(from: [device]) { false }
-
-        XCTAssertTrue(devices.isEmpty)
-        XCTAssertEqual(device.outputReportRequestCount, 0)
-        XCTAssertEqual(device.outputReportRequestOnceCount, 0)
     }
 
     func testLogitechControlsMonitorUsesReceiverAllowlistForUsbDevices() {
@@ -450,8 +317,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "M720",
             serialNumber: "abc",
-            productID: 0xB015,
-            batteryLevel: nil
+            productID: 0xB015
         )
         let otherIdentity = ReceiverLogicalDeviceIdentity(
             receiverLocationID: 2,
@@ -459,8 +325,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "M650",
             serialNumber: "DEF",
-            productID: 0xB02A,
-            batteryLevel: nil
+            productID: 0xB02A
         )
 
         XCTAssertTrue(
@@ -492,8 +357,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "M720",
             serialNumber: "abc",
-            productID: 0xB015,
-            batteryLevel: nil
+            productID: 0xB015
         )
 
         XCTAssertTrue(LogitechReprogrammableControlsMonitor.isNeeded(
@@ -516,8 +380,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "M720",
             serialNumber: nil,
-            productID: 0xB015,
-            batteryLevel: nil
+            productID: 0xB015
         )
         let identityWithoutProduct = ReceiverLogicalDeviceIdentity(
             receiverLocationID: 1,
@@ -525,8 +388,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "M720",
             serialNumber: nil,
-            productID: nil,
-            batteryLevel: nil
+            productID: nil
         )
 
         XCTAssertFalse(
@@ -558,8 +420,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 50
+            productID: 0x1234
         )
         let rhs = ReceiverLogicalDeviceIdentity(
             receiverLocationID: 0x1234,
@@ -567,8 +428,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .trackball,
             name: "Mouse B",
             serialNumber: "BBBB",
-            productID: 0x5678,
-            batteryLevel: 80
+            productID: 0x5678
         )
 
         XCTAssertNotEqual(lhs, rhs)
@@ -581,8 +441,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 50
+            productID: 0x1234
         )
         let rhs = ReceiverLogicalDeviceIdentity(
             receiverLocationID: 0x1234,
@@ -590,8 +449,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .trackball,
             name: "Mouse B",
             serialNumber: "BBBB",
-            productID: 0x5678,
-            batteryLevel: 80
+            productID: 0x5678
         )
 
         XCTAssertTrue(lhs.isSameLogicalDevice(as: rhs))
@@ -1063,8 +921,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 60
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(identities: [identity], connectionSnapshots: [
@@ -1083,8 +940,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 60
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(identities: [identity], connectionSnapshots: [
@@ -1112,8 +968,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 60
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(identities: [identity], connectionSnapshots: [
@@ -1144,8 +999,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 60
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(identities: [mouse], connectionSnapshots: [
@@ -1165,8 +1019,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 60
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(identities: [identity], connectionSnapshots: [
@@ -1355,41 +1208,6 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
         ))
 
         XCTAssertTrue(store.hasUnresolvedConnectedSlot)
-    }
-
-    func testReceiverSlotStateStoreTreatsFreshBatteryMetadataAsReconnectEvidence() {
-        var store = ReceiverSlotStateStore()
-        let disconnectedIdentity = ReceiverLogicalDeviceIdentity(
-            receiverLocationID: 0x1234,
-            slot: 1,
-            kind: .mouse,
-            name: "Mouse A",
-            serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: nil
-        )
-        let reconnectedIdentity = ReceiverLogicalDeviceIdentity(
-            receiverLocationID: 0x1234,
-            slot: 1,
-            kind: .mouse,
-            name: "Mouse A",
-            serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 60
-        )
-
-        _ = store.mergeDiscovery(.init(identities: [disconnectedIdentity], connectionSnapshots: [
-            1: .init(isConnected: false, kind: ReceiverLogicalDeviceKind.mouse.rawValue)
-        ], liveReachableSlots: []))
-        _ = store.mergeDiscovery(.init(
-            identities: [reconnectedIdentity],
-            connectionSnapshots: [:],
-            liveReachableSlots: [1],
-            expectedConnectedDeviceCount: 1,
-            observedSlotKinds: [1: ReceiverLogicalDeviceKind.mouse.rawValue]
-        ))
-
-        XCTAssertEqual(store.currentPublishedIdentities(), [reconnectedIdentity])
     }
 
     func testReceiverSlotStateStoreTreatsPartialSingletonAsIncompleteUntilInventoryReturns() {
@@ -1596,8 +1414,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: nil
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(
@@ -1622,8 +1439,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: nil
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(
@@ -1648,8 +1464,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: "Mouse A",
             serialNumber: "AAAA",
-            productID: 0x1234,
-            batteryLevel: 60
+            productID: 0x1234
         )
 
         _ = store.mergeDiscovery(.init(
@@ -1665,50 +1480,6 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
         XCTAssertTrue(store.needsIdentityRefresh(slot: identity.slot))
     }
 
-    func testConnectedBatteryDeviceDirectIdentityPrefersSerialNumber() {
-        let identity = ConnectedBatteryDeviceInfo.directIdentity(
-            vendorID: 0x046D,
-            productID: 0x405E,
-            serialNumber: "ABC123",
-            locationID: 0x1000,
-            transport: PointerDeviceTransportName.usb,
-            fallbackName: "Mouse"
-        )
-
-        XCTAssertEqual(identity, "serial|1133|16478|ABC123")
-    }
-
-    func testConnectedBatteryDeviceDirectIdentityFallsBackToLocation() {
-        let identity = ConnectedBatteryDeviceInfo.directIdentity(
-            vendorID: 0x046D,
-            productID: 0x405E,
-            serialNumber: nil,
-            locationID: 0x2000,
-            transport: PointerDeviceTransportName.usb,
-            fallbackName: "Mouse"
-        )
-
-        XCTAssertEqual(identity, "location|1133|16478|8192")
-    }
-
-    func testConnectedBatteryDeviceReceiverIdentityUsesReceiverAndSlot() {
-        XCTAssertEqual(
-            ConnectedBatteryDeviceInfo.receiverIdentity(receiverLocationID: 0x1234, slot: 2),
-            "receiver|4660|2"
-        )
-    }
-
-    func testVendorSpecificDeviceMetadataSupportsEquality() {
-        XCTAssertEqual(
-            VendorSpecificDeviceMetadata(name: "MX Master 3", batteryLevel: 50),
-            VendorSpecificDeviceMetadata(name: "MX Master 3", batteryLevel: 50)
-        )
-        XCTAssertNotEqual(
-            VendorSpecificDeviceMetadata(name: "MX Master 3", batteryLevel: 50),
-            VendorSpecificDeviceMetadata(name: "MX Master 3", batteryLevel: 80)
-        )
-    }
-
     func testDeviceManagerDisplayNameUsesSinglePairedDeviceName() {
         let identities = [
             ReceiverLogicalDeviceIdentity(
@@ -1717,8 +1488,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
                 kind: .mouse,
                 name: "M720 Triathlon",
                 serialNumber: nil,
-                productID: nil,
-                batteryLevel: 50
+                productID: nil
             )
         ]
 
@@ -1736,8 +1506,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
                 kind: .mouse,
                 name: "Mouse A",
                 serialNumber: nil,
-                productID: nil,
-                batteryLevel: 50
+                productID: nil
             ),
             ReceiverLogicalDeviceIdentity(
                 receiverLocationID: 1,
@@ -1745,8 +1514,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
                 kind: .trackball,
                 name: "Mouse B",
                 serialNumber: nil,
-                productID: nil,
-                batteryLevel: 80
+                productID: nil
             )
         ]
 
@@ -1769,8 +1537,7 @@ final class VendorSpecificDeviceMetadataTests: XCTestCase {
             kind: .mouse,
             name: name,
             serialNumber: nil,
-            productID: nil,
-            batteryLevel: nil
+            productID: nil
         )
     }
 }

@@ -630,7 +630,7 @@ extension LogitechReceiverMonitoringChannel {
             until: shouldContinue
         ) != nil else {
             os_log(
-                "Bolt receiver unique ID is unavailable: locationID=%{public}@",
+                "Bolt receiver unique ID is unavailable: locationID=%{private}@",
                 log: LogitechHIDPPDeviceMetadataProvider.log,
                 type: .info,
                 locationID.map(String.init) ?? "(nil)"
@@ -710,9 +710,6 @@ extension LogitechReceiverMonitoringChannel {
         let routedName = routedTransport.flatMap { transport in
             metadataProvider.readFriendlyName(using: transport) ?? metadataProvider.readName(using: transport)
         }
-        let batteryLevel = routedTransport.flatMap {
-            metadataProvider.readReceiverBatteryLevel(using: $0)
-        }
         let kind = pairingResponse.flatMap { Self.parseBoltReceiverKind($0.bytes) }
             ?? connectionSnapshot?.kind
             ?? 0
@@ -724,8 +721,7 @@ extension LogitechReceiverMonitoringChannel {
             name: name,
             productID: pairingResponse.flatMap { Self.parseBoltReceiverProductID($0.bytes) },
             serialNumber: pairingResponse.flatMap { Self.parseBoltReceiverSerialNumber($0.bytes) },
-            batteryLevel: batteryLevel,
-            hasLiveMetadata: routedName != nil || batteryLevel != nil
+            hasLiveMetadata: routedName != nil
         )
     }
 
@@ -748,7 +744,6 @@ extension LogitechReceiverMonitoringChannel {
             name: nil,
             productID: Self.parseBoltReceiverProductID(pairingResponse.bytes),
             serialNumber: Self.parseBoltReceiverSerialNumber(pairingResponse.bytes),
-            batteryLevel: nil,
             hasLiveMetadata: false
         )
     }
@@ -786,8 +781,7 @@ extension LogitechReceiverMonitoringChannel {
                 kind: kind,
                 name: slot.name ?? baseName,
                 serialNumber: slot.serialNumber,
-                productID: slot.productID,
-                batteryLevel: slot.batteryLevel
+                productID: slot.productID
             )
         }
 

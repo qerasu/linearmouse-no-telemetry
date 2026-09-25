@@ -304,8 +304,7 @@ final class LogitechHIDPPDeviceMetadataProviderTests: XCTestCase {
             kind: .mouse,
             name: "Mouse",
             serialNumber: nil,
-            productID: nil,
-            batteryLevel: nil
+            productID: nil
         )
         let partial = LogitechHIDPPDeviceMetadataProvider.ReceiverPointingDeviceDiscovery(
             identities: [identity],
@@ -1410,7 +1409,6 @@ final class LogitechHIDPPDeviceMetadataProviderTests: XCTestCase {
             name: name,
             serialNumber: serialNumber,
             productID: productID,
-            batteryLevel: nil,
             hasLiveMetadata: name != nil || serialNumber != nil || productID != nil
         )
     }

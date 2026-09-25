@@ -22,15 +22,6 @@ final class ButtonMappingActionBindingTests: XCTestCase {
         XCTAssertEqual(action, .arg1(.mouseWheelScrollUp(.line(3))))
     }
 
-    func testRunCommandBindingUpdatesCommand() {
-        var action: Scheme.Buttons.Mapping.Action = .arg1(.run("open"))
-        let binding = makeActionBinding(action) { action = $0 }
-
-        binding.runCommand.wrappedValue = "say hi"
-
-        XCTAssertEqual(action, .arg1(.run("say hi")))
-    }
-
     func testScrollDistanceBindingUpdatesCurrentScrollAction() {
         var action: Scheme.Buttons.Mapping.Action = .arg1(.mouseWheelScrollDown(.line(3)))
         let binding = makeActionBinding(action) { action = $0 }

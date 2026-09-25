@@ -309,7 +309,7 @@ final class SmoothedScrollingTransformer: EventTransformer, Deactivatable {
         updateSyntheticMomentumState(afterPosting: phase)
 
         os_log(
-            "post smoothed scroll deltaX=%{public}.3f deltaY=%{public}.3f phase=%{public}@ momentum=%{public}@",
+            "post smoothed scroll deltaX=%{private}.3f deltaY=%{private}.3f phase=%{private}@ momentum=%{private}@",
             log: Self.log,
             type: .info,
             postedDeltaX,

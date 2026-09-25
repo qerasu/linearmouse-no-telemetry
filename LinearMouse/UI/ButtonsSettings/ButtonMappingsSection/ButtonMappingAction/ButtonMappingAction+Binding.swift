@@ -16,21 +16,6 @@ extension Binding where Value == Scheme.Buttons.Mapping.Action {
         )
     }
 
-    var runCommand: Binding<String> {
-        Binding<String>(
-            get: {
-                guard case let .arg1(.run(command)) = wrappedValue else {
-                    return ""
-                }
-
-                return command
-            },
-            set: {
-                wrappedValue = .arg1(.run($0))
-            }
-        )
-    }
-
     var scrollDistance: Binding<Scheme.Scrolling.Distance> {
         Binding<Scheme.Scrolling.Distance>(
             get: {
@@ -86,8 +71,6 @@ extension Scheme.Buttons.Mapping.Action.Kind {
         switch self {
         case let .arg0(value):
             Text(value.description.capitalized)
-        case .run:
-            Text("Run shell command…")
         case .mouseWheelScrollUp:
             Text("Scroll up…")
         case .mouseWheelScrollDown:

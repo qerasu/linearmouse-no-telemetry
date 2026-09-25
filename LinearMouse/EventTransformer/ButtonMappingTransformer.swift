@@ -133,13 +133,6 @@ final class ButtonMappingTransformer: EventTransformer, DeferredEventTransformer
             return nil
         }
 
-        if [.keyDown, .keyUp].contains(event.type) {
-            if let flags = actionExecutor.keySimulator.modifiedCGEventFlags(of: event) {
-                event.flags = flags
-            }
-            return event
-        }
-
         let now = monotonicClock()
         advanceRecognitionLanes(to: now)
 
@@ -459,7 +452,7 @@ final class ButtonMappingTransformer: EventTransformer, DeferredEventTransformer
 
         for action in output.actions {
             os_log(
-                "Matched button action: %{public}@",
+                "Matched button action: %{private}@",
                 log: Self.log,
                 type: .info,
                 String(describing: action)

@@ -36,8 +36,6 @@ extension Scheme.Buttons.Mapping.Action: Codable {
 
 extension Scheme.Buttons.Mapping.Action.Arg1: Codable {
     enum CodingKeys: String, CodingKey {
-        case run
-
         case mouseWheelScrollUp = "mouse.wheel.scrollUp"
         case mouseWheelScrollDown = "mouse.wheel.scrollDown"
         case mouseWheelScrollLeft = "mouse.wheel.scrollLeft"
@@ -47,11 +45,6 @@ extension Scheme.Buttons.Mapping.Action.Arg1: Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        if let command = try? container.decode(String.self, forKey: .run) {
-            self = .run(command)
-            return
-        }
 
         if let distance = try? container.decode(Scheme.Scrolling.Distance.self, forKey: .mouseWheelScrollUp) {
             self = .mouseWheelScrollUp(distance)
@@ -83,10 +76,6 @@ extension Scheme.Buttons.Mapping.Action.Arg1: Codable {
 
     func encode(to encoder: Encoder) throws {
         switch self {
-        case let .run(command):
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(command, forKey: .run)
-
         case let .mouseWheelScrollUp(distance):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(distance, forKey: .mouseWheelScrollUp)

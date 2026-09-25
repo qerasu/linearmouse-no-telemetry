@@ -513,7 +513,7 @@ extension AutoScrollTransformer: EventTransformer, DeferredEventTransformer {
 
     private func activate(at point: CGPoint, current: CGPoint? = nil, session: Session) {
         os_log(
-            "Auto scroll activated (modes=%{public}@, button=%{public}d)",
+            "Auto scroll activated (modes=%{private}@, button=%{private}d)",
             log: Self.log,
             type: .info,
             modes.map(\.rawValue).joined(separator: ","),
@@ -666,7 +666,7 @@ extension AutoScrollTransformer: EventTransformer, DeferredEventTransformer {
            initial.hit.path == resolved.hit.path,
            initial.point == resolved.point {
             os_log(
-                "Auto scroll AX hit result=%{public}@ point=%{public}@ path=%{public}@",
+                "Auto scroll AX hit result=%{private}@ point=%{private}@ path=%{private}@",
                 log: Self.log,
                 type: .info,
                 resolved.hit.summary,
@@ -677,7 +677,7 @@ extension AutoScrollTransformer: EventTransformer, DeferredEventTransformer {
         }
 
         os_log(
-            "Auto scroll AX hit initial=%{public}@ initialPoint=%{public}@ initialPath=%{public}@ resolved=%{public}@ resolvedPoint=%{public}@ resolvedPath=%{public}@",
+            "Auto scroll AX hit initial=%{private}@ initialPoint=%{private}@ initialPath=%{private}@ resolved=%{private}@ resolvedPoint=%{private}@ resolvedPath=%{private}@",
             log: Self.log,
             type: .info,
             initial.hit.summary,

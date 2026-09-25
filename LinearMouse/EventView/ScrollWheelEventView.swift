@@ -142,7 +142,7 @@ class ScrollWheelEventView: MouseEventView {
             newValue[1][3]
         )
         os_log(
-            "transform: oldValue=%{public}@, matrix=%{public}@, newValue=%{public}@",
+            "transform: oldValue=%{private}@, matrix=%{private}@, newValue=%{private}@",
             log: Self.log,
             type: .info,
             String(describing: oldValue),

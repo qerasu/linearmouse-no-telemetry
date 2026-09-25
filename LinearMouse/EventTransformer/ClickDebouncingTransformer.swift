@@ -49,7 +49,7 @@ class ClickDebouncingTransformer: EventTransformer {
             touchLastClickedAt()
             if intervalSinceLastClick <= timeout {
                 os_log(
-                    "Mouse down ignored because interval since last click %{public}f <= %{public}f",
+                    "Mouse down ignored because interval since last click %{private}f <= %{private}f",
                     log: Self.log,
                     type: .info,
                     intervalSinceLastClick,

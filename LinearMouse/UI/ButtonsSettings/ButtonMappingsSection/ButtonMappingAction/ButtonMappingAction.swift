@@ -13,8 +13,6 @@ struct ButtonMappingAction: View {
         switch action {
         case .arg0:
             EmptyView()
-        case .arg1(.run):
-            ButtonMappingActionRun(action: $action)
         case .arg1(.mouseWheelScrollUp),
              .arg1(.mouseWheelScrollDown),
              .arg1(.mouseWheelScrollLeft),

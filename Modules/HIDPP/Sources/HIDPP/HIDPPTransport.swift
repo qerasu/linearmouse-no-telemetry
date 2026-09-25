@@ -21,7 +21,6 @@ public struct HIDPPTransport {
     private let requestTimeout: TimeInterval
     private let requestDeadline: Date?
     public let receiverSlot: UInt8?
-    public let isReceiverRoutedDevice: Bool
 
     public init?(
         device: HIDPPDeviceIO,
@@ -47,7 +46,6 @@ public struct HIDPPTransport {
         self.requestTimeout = max(0, requestTimeout)
         requestDeadline = deadline
         receiverSlot = deviceIndex
-        isReceiverRoutedDevice = receiverSlot != nil
         acceptedReplyIndices = deviceIndex.map { Set([$0]) } ?? HIDPPConstants.directReplyIndices
     }
 

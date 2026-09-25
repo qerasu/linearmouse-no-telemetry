@@ -17,7 +17,6 @@ Here is a simple example of LinearMouse configuration.
 
 ```json
 {
-  "$schema": "https://app.linearmouse.org/schema/0.7.2",
   "schemes": [
     {
       "if": {
@@ -36,14 +35,6 @@ Here is a simple example of LinearMouse configuration.
 ```
 
 This configuration reverses the vertical scrolling direction for any mouse connected to your device.
-
-## JSON Schema
-
-As you can see, `$schema` defines the JSON schema of the LinearMouse configuration, which enables
-autocompletion in editors like VS Code.
-
-SON schemas are published for each LinearMouse version. Backward compatibility is guaranteed for
-the same major versions.
 
 ## Schemes
 
@@ -508,9 +499,6 @@ The following table lists all the buttons:
 | 4      | The fifth button, typically the forward button.                  |
 | 5-31   | Other buttons.                                                   |
 
-`{ "action": { "run": "open -a Launchpad" } }` assigns a shell command `open -a LaunchPad` to
-the button. When the button is clicked, the shell command will be executed.
-
 ### Advanced triggers
 
 The structured `trigger` format supports chords, long presses, swipes, pressed/released action
@@ -918,18 +906,6 @@ A simple action is an action without any parameters.
 | `mouse.button.back`         | Mouse: Button: Act as back button.    |
 | `mouse.button.forward`      | Mouse: Button: Act as forward button. |
 
-#### Run shell commands
-
-```json
-{
-  "action": {
-    "run": "<command>"
-  }
-}
-```
-
-The `<command>` will be executed with bash.
-
 #### Scroll a certain distance
 
 ##### Scroll up 2 lines
@@ -961,8 +937,6 @@ The `<command>` will be executed with bash.
   }
 }
 ```
-
-To see the full list of keys, please refer to [Configuration.d.ts#L652](Configuration.d.ts#L652).
 
 #### Numpad keys support
 

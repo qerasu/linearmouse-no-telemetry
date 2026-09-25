@@ -48,6 +48,6 @@ extension AccessibilityPermissionWindow: NSWindowDelegate {
             exit(0)
         }
 
-        Application.restart()
+        (NSApplication.shared.delegate as? AppDelegate)?.resumeAfterAccessibilityPermissionGranted()
     }
 }

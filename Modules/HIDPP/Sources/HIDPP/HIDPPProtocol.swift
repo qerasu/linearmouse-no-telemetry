@@ -19,11 +19,7 @@ public enum HIDPPFeatureID: UInt16, Sendable {
     case root = 0x0000
     case deviceName = 0x0005
     case deviceFriendlyName = 0x0007
-    case batteryStatus = 0x1000
-    case batteryVoltage = 0x1001
-    case unifiedBattery = 0x1004
     case reprogControlsV4 = 0x1B04
-    case adcMeasurement = 0x1F20
     case hiresWheel = 0x2121
     case adjustableDPI = 0x2201
 

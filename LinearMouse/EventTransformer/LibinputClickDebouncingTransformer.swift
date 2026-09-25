@@ -167,7 +167,7 @@ final class LibinputClickDebouncingTransformer: EventTransformer, DeferredEventT
                 cancelSpuriousTimer()
             case .spuriousDebouncingEnabled:
                 os_log(
-                    "Enabled short release debouncing for button %{public}u",
+                    "Enabled short release debouncing for button %{private}u",
                     log: Self.log,
                     type: .info,
                     button.rawValue
@@ -178,7 +178,7 @@ final class LibinputClickDebouncingTransformer: EventTransformer, DeferredEventT
         discardUnusedPendingEvents()
 
         os_log(
-            "Button %{public}u: %{public}@ -> %{public}@ -> %{public}@",
+            "Button %{private}u: %{private}@ -> %{private}@ -> %{private}@",
             log: Self.log,
             type: .debug,
             button.rawValue,
@@ -201,7 +201,7 @@ final class LibinputClickDebouncingTransformer: EventTransformer, DeferredEventT
 
         guard let deferredEvent else {
             os_log(
-                "Cannot emit %{public}@ for button %{public}u: no pending event",
+                "Cannot emit %{private}@ for button %{private}u: no pending event",
                 log: Self.log,
                 type: .error,
                 String(describing: state),

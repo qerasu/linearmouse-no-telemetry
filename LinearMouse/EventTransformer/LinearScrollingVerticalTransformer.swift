@@ -72,7 +72,7 @@ class LinearScrollingVerticalTransformer: EventTransformer {
         }
 
         os_log(
-            "continuous=%{public}@, oldValue=%{public}@, newValue=%{public}@",
+            "continuous=%{private}@, oldValue=%{private}@, newValue=%{private}@",
             log: Self.log,
             type: .info,
             String(describing: continuous),

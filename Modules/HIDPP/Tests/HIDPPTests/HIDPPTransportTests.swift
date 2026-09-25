@@ -23,7 +23,6 @@ final class HIDPPTransportTests: XCTestCase {
         XCTAssertEqual(Array(device.reports[0].prefix(6)), [0x11, 0xFF, 0x22, 0x38, 0x01, 0x02])
         XCTAssertEqual(device.reports[0].count, HIDPPConstants.longReportLength)
         XCTAssertNil(transport.receiverSlot)
-        XCTAssertFalse(transport.isReceiverRoutedDevice)
     }
 
     func testRoutesRequestThroughReceiverSlot() throws {
@@ -36,7 +35,6 @@ final class HIDPPTransportTests: XCTestCase {
         XCTAssertNotNil(transport.request(featureIndex: 0x22, function: 0x01, parameters: []))
         XCTAssertEqual([UInt8](device.reports[0])[1], 0x02)
         XCTAssertEqual(transport.receiverSlot, 0x02)
-        XCTAssertTrue(transport.isReceiverRoutedDevice)
     }
 
     func testRetriesOnlyBusyResponses() throws {

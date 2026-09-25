@@ -7,14 +7,7 @@ import Foundation
 import JSONPatcher
 
 struct Configuration: Codable, Equatable {
-    let jsonSchema = "https://schema.linearmouse.app/\(LinearMouse.appVersion)"
-
     var schemes: [Scheme] = []
-
-    enum CodingKeys: String, CodingKey {
-        case jsonSchema = "$schema"
-        case schemes
-    }
 
     enum ConfigurationError: Error {
         case unsupportedEncoding

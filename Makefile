@@ -1,64 +1,9 @@
 BUILD_DIR = $(CURDIR)/build
-ARCHIVE_PATH = $(CURDIR)/build/LinearMouse.xcarchive
-TARGET_DIR = $(CURDIR)/build/target
-TARGET_DMG = $(CURDIR)/build/LinearMouse.dmg
 XCODEBUILD_ARGS ?=
 
-all: configure clean lint test package
+all: build
 
-configure: Signing.xcconfig Version.xcconfig .git/hooks/pre-commit
+build:
+	xcodebuild build -project LinearMouse.xcodeproj -scheme LinearMouse -configuration Release -derivedDataPath '$(BUILD_DIR)' -disableAutomaticPackageResolution CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO $(XCODEBUILD_ARGS)
 
-configure-release: configure Release.xcconfig
-
-Signing.xcconfig:
-	@./Scripts/configure-code-signing
-
-Version.xcconfig:
-	@./Scripts/configure-version
-
-Release.xcconfig:
-	@./Scripts/configure-release
-
-.git/hooks/pre-commit:
-	cp ./Scripts/pre-commit $@
-
-clean:
-	rm -fr build
-
-lint:
-	swiftformat --lint .
-	swiftlint .
-
-test: hidpp-test gesturekit-test dockkit-test pointerkit-test
-	xcodebuild test -project LinearMouse.xcodeproj -scheme LinearMouse $(XCODEBUILD_ARGS)
-
-hidpp-test:
-	swift test --package-path Modules/HIDPP
-
-gesturekit-test:
-	swift test --package-path Modules/GestureKit
-
-dockkit-test:
-	swift test --package-path Modules/DockKit
-
-pointerkit-test:
-	swift test --package-path Modules/PointerKit
-
-package: $(TARGET_DMG)
-
-$(BUILD_DIR)/Release/LinearMouse.app:
-	xcodebuild archive -project LinearMouse.xcodeproj -scheme LinearMouse -archivePath '$(ARCHIVE_PATH)' $(XCODEBUILD_ARGS)
-	xcodebuild -exportArchive -archivePath '$(ARCHIVE_PATH)' -exportOptionsPlist ExportOptions.plist -exportPath '$(BUILD_DIR)/Release'
-
-$(TARGET_DMG): $(BUILD_DIR)/Release/LinearMouse.app
-	rm -rf '$(TARGET_DIR)'
-	rm -f '$(TARGET_DMG)'
-	mkdir '$(TARGET_DIR)'
-	cp -a '$(BUILD_DIR)/Release/LinearMouse.app' '$(TARGET_DIR)'
-	ln -s /Applications '$(TARGET_DIR)/'
-	hdiutil create -format UDBZ -srcfolder '$(TARGET_DIR)/' -volname LinearMouse '$(TARGET_DMG)'
-
-prepublish: package
-	@./Scripts/sign-and-notarize
-
-.PHONY: all configure test hidpp-test gesturekit-test dockkit-test pointerkit-test build clean package
+.PHONY: all build

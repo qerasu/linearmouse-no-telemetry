@@ -139,7 +139,7 @@ extension Device {
             let slot = logitechReceiverRouteSnapshot.map { String($0.slot) } ?? "direct"
             if applied != nil {
                 os_log(
-                    "Logitech Hi-Res Wheel %{public}@ succeeded: enabled=%{public}@ device=%{public}@ slot=%{public}@ attempt=%{public}d duration=%{public}.3f",
+                    "Logitech Hi-Res Wheel %{private}@ succeeded: enabled=%{private}@ device=%{private}@ slot=%{private}@ attempt=%{private}d duration=%{private}.3f",
                     log: Self.logitechHiResWheelLog,
                     type: .info,
                     phase,
@@ -153,7 +153,7 @@ extension Device {
             }
 
             os_log(
-                "Logitech Hi-Res Wheel %{public}@ attempt failed: enabled=%{public}@ device=%{public}@ slot=%{public}@ attempt=%{public}d final=%{public}@ duration=%{public}.3f",
+                "Logitech Hi-Res Wheel %{private}@ attempt failed: enabled=%{private}@ device=%{private}@ slot=%{private}@ attempt=%{private}d final=%{private}@ duration=%{private}.3f",
                 log: Self.logitechHiResWheelLog,
                 type: attempt.isFinal ? .error : .info,
                 phase,
