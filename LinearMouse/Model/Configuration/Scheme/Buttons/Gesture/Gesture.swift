@@ -74,3 +74,57 @@ extension Scheme.Buttons.Gesture: Codable {
         try container.encodeIfPresent($actions, forKey: .actions)
     }
 }
+
+extension Scheme.Buttons.Gesture {
+    func merge(into gesture: inout Self) {
+        if let enabled {
+            gesture.enabled = enabled
+        }
+        if let trigger {
+            gesture.trigger = trigger
+        }
+        if let threshold {
+            gesture.threshold = threshold
+        }
+        if let deadZone {
+            gesture.deadZone = deadZone
+        }
+        if let cooldownMs {
+            gesture.cooldownMs = cooldownMs
+        }
+        if let actions = $actions {
+            actions.merge(into: &gesture.$actions)
+        }
+    }
+
+    func merge(into gesture: inout Self?) {
+        if gesture == nil {
+            gesture = Self()
+        }
+        merge(into: &gesture!)
+    }
+}
+
+extension Scheme.Buttons.Gesture.Actions {
+    func merge(into actions: inout Self) {
+        if let left {
+            actions.left = left
+        }
+        if let right {
+            actions.right = right
+        }
+        if let up {
+            actions.up = up
+        }
+        if let down {
+            actions.down = down
+        }
+    }
+
+    func merge(into actions: inout Self?) {
+        if actions == nil {
+            actions = Self()
+        }
+        merge(into: &actions!)
+    }
+}

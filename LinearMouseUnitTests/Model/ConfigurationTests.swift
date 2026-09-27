@@ -73,7 +73,7 @@ final class ConfigurationTests: XCTestCase {
         XCTAssertEqual(matchedScheme.pointer.disableAcceleration, true)
     }
 
-    func testMatchSchemeWithSpecificDeviceMatcherMergesDeviceCategorySchemes() {
+    func testMatchSchemeWithSpecificDeviceMatcherOverridesDeviceCategorySettings() {
         var categoryScheme = Scheme(if: [.init(device: DeviceMatcher(category: .mouse))])
         categoryScheme.pointer.disableAcceleration = true
         categoryScheme.scrolling.reverse.vertical = true
@@ -90,6 +90,30 @@ final class ConfigurationTests: XCTestCase {
 
         XCTAssertEqual(matchedScheme.pointer.disableAcceleration, false)
         XCTAssertEqual(matchedScheme.scrolling.reverse.vertical, true)
+    }
+
+    func testDeviceSpecificGestureSettingsOverrideInheritedCategorySettings() {
+        let categoryMatcher = DeviceMatcher(category: .mouse)
+        var specificMatcher = categoryMatcher
+        specificMatcher.vendorID = 1
+        specificMatcher.productID = 2
+
+        var categoryScheme = Scheme(if: [.init(device: categoryMatcher)])
+        categoryScheme.buttons.gesture.enabled = true
+        categoryScheme.buttons.gesture.actions.up = .showDesktop
+        categoryScheme.buttons.gesture.actions.down = .showDesktop
+
+        var deviceScheme = Scheme(if: [.init(device: specificMatcher)])
+        deviceScheme.buttons.gesture.threshold = 20
+        deviceScheme.buttons.gesture.actions.down = .appExpose
+
+        let configuration = Configuration(schemes: [categoryScheme, deviceScheme])
+        let matchedScheme = configuration.matchScheme(withDeviceMatcher: specificMatcher)
+
+        XCTAssertEqual(matchedScheme.buttons.gesture.enabled, true)
+        XCTAssertEqual(matchedScheme.buttons.gesture.threshold, 20)
+        XCTAssertEqual(matchedScheme.buttons.gesture.actions.up, .some(.showDesktop))
+        XCTAssertEqual(matchedScheme.buttons.gesture.actions.down, .some(.appExpose))
     }
 
     func testDeviceCategorySchemeInsertsBeforeDeviceSpecificSchemes() {

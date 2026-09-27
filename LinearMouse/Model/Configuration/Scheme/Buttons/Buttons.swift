@@ -49,7 +49,7 @@ extension Scheme.Buttons {
         }
 
         if let gesture = $gesture {
-            buttons.$gesture = gesture
+            gesture.merge(into: &buttons.$gesture)
         }
     }
 
