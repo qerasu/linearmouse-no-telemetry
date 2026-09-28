@@ -165,7 +165,6 @@
     "Create" : {},
     "Cubic ease-in-out with a weightier middle section." : {},
     "Custom" : {},
-    "Daily" : {},
     "Debounce button clicks" : {},
     "Debounce interval" : {},
     "Debouncing method" : {},
@@ -202,10 +201,8 @@
     "Enable autoscroll" : {},
     "Enable gesture button" : {},
     "Enable universal back and forward" : {},
-    "Enable verbose logging" : {},
     "Enabling this option will log all input events, which may increase CPU usage while using %@, but can be useful for troubleshooting." : {},
     "Execute" : {},
-    "Export logs" : {},
     "Export the logs for the last 5 minutes." : {},
     "Failed to create GlobalEventTap: Accessibility permission not granted" : {},
     "Failed to load the configuration: %@" : {},
@@ -326,7 +323,6 @@
       "comment" : "Section title for available interaction modes."
     },
     "Modifier Keys" : {},
-    "Monthly" : {},
     "Mouse" : {},
     "Mouse Button" : {},
     "Mouse Wheel" : {},
@@ -384,7 +380,6 @@
     "Press %@ simultaneously with %@" : {
       "comment" : "Localized simultaneous button trigger"
     },
-    "Press %@ twice to reveal the pointer." : {},
     "Press a button or scroll" : {
       "comment" : "Button mapping recorder prompt"
     },
@@ -510,7 +505,6 @@
       "comment" : "Setting label for whether the app icon is shown in the macOS Dock."
     },
     "Show in menu bar" : {},
-    "Show pointer location" : {},
     "Slow" : {},
     "Smart zoom" : {},
     "Smooth" : {},
@@ -576,7 +570,6 @@
     },
     "Very fast quartic pickup with a crisp release." : {},
     "Waiting for device…" : {},
-    "Weekly" : {},
     "When needed" : {},
     "While pressed action" : {},
     "Window" : {},

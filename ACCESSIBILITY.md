@@ -9,7 +9,7 @@ You need to grant Accessibility permission at first launch.
 2. Click the lock to make changes.
 3. Toggle “LinearMouse” on.
 
-LinearMouse quits after permission is granted. Open it again manually.
+LinearMouse resumes automatically after permission is granted. You don't need to reopen it.
 
 ## Not working?
 

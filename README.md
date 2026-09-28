@@ -1,15 +1,9 @@
-# LinearMouse (local build)
+# LinearMouse — local fork
 
-This checkout builds an English-only macOS app without an in-app updater or external help links.
+macOS utility for configuring mouse and trackpad behavior. No analytics or telemetry.
 
-Build once with Xcode installed:
+Compared with upstream LinearMouse, this fork removes automatic updates, external help and feedback links,
+non-English translations, battery monitoring, pointer reveal, and event-log export. It replaces the
+third-party login-at-startup integration with macOS's native service and requires macOS 13+.
 
-```sh
-make
-```
-
-The app is written to `build/Build/Products/Release/LinearMouse.app`. Xcode may download the pinned Swift packages during this build. The app needs Accessibility permission to control mouse input.
-
-See [ACCESSIBILITY.md](ACCESSIBILITY.md) for permission details and [Documentation/Configuration.md](Documentation/Configuration.md) for settings.
-
-License: [MIT](LICENSE).
+Build locally with `make` (Xcode required).
