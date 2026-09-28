@@ -1,7 +1,6 @@
 // MIT License
 // Copyright (c) 2021-2026 LinearMouse
 
-import Carbon
 @testable import KeyKit
 import XCTest
 
@@ -15,6 +14,7 @@ final class KeySimulatorEventFieldsTests: XCTestCase {
         let simulator = KeySimulator { event, _ in
             recordedEvents.append(event)
         }
+        let keyboardType = try XCTUnwrap(CGEventSource(stateID: .hidSystemState)?.keyboardType)
 
         let before = DispatchTime.now().uptimeNanoseconds
         try simulator.press(keys: [.f1], tap: nil)
@@ -30,7 +30,7 @@ final class KeySimulatorEventFieldsTests: XCTestCase {
             XCTAssertLessThanOrEqual(event.timestamp, after)
             XCTAssertEqual(
                 event.getIntegerValueField(.keyboardEventKeyboardType),
-                Int64(LMGetKbdType())
+                Int64(keyboardType)
             )
         }
     }
