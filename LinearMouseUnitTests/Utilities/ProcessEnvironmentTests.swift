@@ -10,7 +10,7 @@ final class ProcessEnvironmentTests: XCTestCase {
     }
 
     func testProcessMetadataCacheDoesNotReuseValueForNewProcess() {
-        let cache = ProcessMetadataCache<String>(countLimit: 16)
+        let cache = ProcessMetadataCache(countLimit: 16)
         let firstProcess = ProcessIdentity(pid: 42, startTimeSeconds: 100, startTimeMicroseconds: 1)
         let secondProcess = ProcessIdentity(pid: 42, startTimeSeconds: 200, startTimeMicroseconds: 2)
 
