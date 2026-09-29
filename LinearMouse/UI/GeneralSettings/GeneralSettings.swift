@@ -1,13 +1,12 @@
 // MIT License
 // Copyright (c) 2021-2026 LinearMouse
 
-import Defaults
 import SwiftUI
 
 struct GeneralSettings: View {
-    @Default(.menuBarVisibilityMode) var menuBarVisibilityMode
-    @Default(.showInDock) var showInDock
-    @Default(.bypassEventsFromOtherApplications) var bypassEventsFromOtherApplications
+    @AppStorage(UserDefaultsKey.menuBarVisibilityMode) private var menuBarVisibilityMode = MenuBarVisibilityMode.always
+    @AppStorage(UserDefaultsKey.showInDock) private var showInDock = true
+    @AppStorage(UserDefaultsKey.bypassEventsFromOtherApplications) private var bypassEventsFromOtherApplications = false
     @ObservedObject private var startAtLogin = StartAtLogin.shared
 
     var body: some View {

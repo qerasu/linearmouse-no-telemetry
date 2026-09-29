@@ -3,12 +3,11 @@
 
 import Combine
 import Foundation
-import PublishedObject
 
 class PointerSettingsState: ObservableObject {
     static let shared: PointerSettingsState = .init()
 
-    @PublishedObject private var schemeState = SchemeState.shared
+    private let schemeState = SchemeState.shared
     private let deviceState = DeviceState.shared
     private var subscriptions = Set<AnyCancellable>()
 
@@ -25,6 +24,12 @@ class PointerSettingsState: ObservableObject {
     private static let pointerHardwareDPIApplyDebounceInterval: TimeInterval = 0.25
 
     private init() {
+        schemeState.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &subscriptions)
+
         deviceState.$currentDeviceRef
             .debounce(for: 0.1, scheduler: RunLoop.main)
             .removeDuplicates()

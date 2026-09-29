@@ -3,7 +3,6 @@
 
 import Cocoa
 import Combine
-import Defaults
 import SwiftUI
 
 class SettingsWindowController: NSWindowController {
@@ -11,7 +10,7 @@ class SettingsWindowController: NSWindowController {
 
     private var released = true
     private var splitViewController: SettingsSplitViewController?
-    private var showInDockTask: Task<Void, Never>?
+    private var showInDockSubscription: AnyCancellable?
 
     private func initWindowIfNeeded() {
         guard released else {
@@ -51,23 +50,31 @@ class SettingsWindowController: NSWindowController {
     }
 
     private func startShowInDockTask() {
-        showInDockTask = Task {
-            for await value in Defaults.updates(.showInDock, initial: true) {
-                if value {
-                    NSApplication.shared.setActivationPolicy(.regular)
-                } else {
-                    NSApplication.shared.setActivationPolicy(.accessory)
-                    NSApplication.shared.activate(ignoringOtherApps: true)
-                }
+        let defaults = UserDefaults.standard
+        showInDockSubscription = NotificationCenter.default
+            .publisher(for: UserDefaults.didChangeNotification)
+            .map { _ in defaults.showInDock }
+            .prepend(defaults.showInDock)
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] showInDock in
+                self?.updateActivationPolicy(showInDock: showInDock)
             }
-
-            NSApplication.shared.setActivationPolicy(.accessory)
-        }
     }
 
     private func stopShowInDockTask() {
-        showInDockTask?.cancel()
-        showInDockTask = nil
+        showInDockSubscription?.cancel()
+        showInDockSubscription = nil
+        NSApplication.shared.setActivationPolicy(.accessory)
+    }
+
+    private func updateActivationPolicy(showInDock: Bool) {
+        if showInDock {
+            NSApplication.shared.setActivationPolicy(.regular)
+        } else {
+            NSApplication.shared.setActivationPolicy(.accessory)
+            NSApplication.shared.activate(ignoringOtherApps: true)
+        }
     }
 
     func bringToFront() {

@@ -1,9 +1,7 @@
 // MIT License
 // Copyright (c) 2021-2026 LinearMouse
 
-import Defaults
-
-struct DeviceMatcher: Codable, Equatable, Hashable, Defaults.Serializable {
+struct DeviceMatcher: Codable, Equatable, Hashable {
     @HexRepresentation var vendorID: Int?
     @HexRepresentation var productID: Int?
     var productName: String?

@@ -8,15 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		9724FACA2A3E04DE00622F5A /* KeyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9724FAC92A3E04DE00622F5A /* KeyKit */; };
-		972A5E30285D891100CB6440 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 972A5E2F285D891100CB6440 /* Defaults */; };
 		975979DB2A6BA1A700016EDF /* ObservationToken in Frameworks */ = {isa = PBXBuildFile; productRef = 975979DA2A6BA1A700016EDF /* ObservationToken */; };
-		977638F9286BE9EE00A698B6 /* PublishedObject in Frameworks */ = {isa = PBXBuildFile; productRef = 977638F8286BE9EE00A698B6 /* PublishedObject */; };
-		978DBCA629AB1732002259B3 /* JSONPatcher in Frameworks */ = {isa = PBXBuildFile; productRef = 978DBCA529AB1732002259B3 /* JSONPatcher */; };
 		97A7A39C28587E8C00EE4833 /* PointerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 97A7A39B28587E8C00EE4833 /* PointerKit */; };
 		97C5D8FF2856E3CB00CBED2D /* GestureKit in Frameworks */ = {isa = PBXBuildFile; productRef = 97C5D8FE2856E3CB00CBED2D /* GestureKit */; };
 		97C97728288FC49F009094BA /* DockKit in Frameworks */ = {isa = PBXBuildFile; productRef = 97C97727288FC49F009094BA /* DockKit */; };
 		D2D2D2D2D2D2D2D2D2D2D2D2 /* HIDPP in Frameworks */ = {isa = PBXBuildFile; productRef = D1D1D1D1D1D1D1D1D1D1D1D1 /* HIDPP */; };
-		B7F6C5F827A4F6A800E5400B /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = B7F6C5F727A4F6A800E5400B /* LRUCache */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,16 +54,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				977638F9286BE9EE00A698B6 /* PublishedObject in Frameworks */,
-				978DBCA629AB1732002259B3 /* JSONPatcher in Frameworks */,
 				9724FACA2A3E04DE00622F5A /* KeyKit in Frameworks */,
 				97C97728288FC49F009094BA /* DockKit in Frameworks */,
-				972A5E30285D891100CB6440 /* Defaults in Frameworks */,
 				97A7A39C28587E8C00EE4833 /* PointerKit in Frameworks */,
 				D2D2D2D2D2D2D2D2D2D2D2D2 /* HIDPP in Frameworks */,
 				97C5D8FF2856E3CB00CBED2D /* GestureKit in Frameworks */,
 				975979DB2A6BA1A700016EDF /* ObservationToken in Frameworks */,
-				B7F6C5F827A4F6A800E5400B /* LRUCache in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,14 +125,10 @@
 			);
 			name = LinearMouse;
 			packageProductDependencies = (
-				B7F6C5F727A4F6A800E5400B /* LRUCache */,
 				97C5D8FE2856E3CB00CBED2D /* GestureKit */,
 				97A7A39B28587E8C00EE4833 /* PointerKit */,
 				D1D1D1D1D1D1D1D1D1D1D1D1 /* HIDPP */,
-				972A5E2F285D891100CB6440 /* Defaults */,
-				977638F8286BE9EE00A698B6 /* PublishedObject */,
 				97C97727288FC49F009094BA /* DockKit */,
-				978DBCA529AB1732002259B3 /* JSONPatcher */,
 				9724FAC92A3E04DE00622F5A /* KeyKit */,
 				975979DA2A6BA1A700016EDF /* ObservationToken */,
 			);
@@ -197,10 +185,12 @@
 			);
 			mainGroup = B75A060F2671E9D800BEAF77;
 			packageReferences = (
-				B7F6C5F627A4F6A800E5400B /* XCRemoteSwiftPackageReference "LRUCache" */,
-				972A5E2E285D891100CB6440 /* XCRemoteSwiftPackageReference "Defaults" */,
-				977638F7286BE9EE00A698B6 /* XCRemoteSwiftPackageReference "PublishedObject" */,
-				978DBCA429AB1732002259B3 /* XCRemoteSwiftPackageReference "JSONPatcher" */,
+				A31C6E9D8B7F4101BFEA0001 /* XCLocalSwiftPackageReference "Modules/KeyKit" */,
+				A31C6E9D8B7F4101BFEA0002 /* XCLocalSwiftPackageReference "Modules/DockKit" */,
+				A31C6E9D8B7F4101BFEA0003 /* XCLocalSwiftPackageReference "Modules/PointerKit" */,
+				A31C6E9D8B7F4101BFEA0004 /* XCLocalSwiftPackageReference "Modules/HIDPP" */,
+				A31C6E9D8B7F4101BFEA0005 /* XCLocalSwiftPackageReference "Modules/GestureKit" */,
+				A31C6E9D8B7F4101BFEA0006 /* XCLocalSwiftPackageReference "Modules/ObservationToken" */,
 			);
 			productRefGroup = B75A06192671E9D800BEAF77 /* Products */;
 			projectDirPath = "";
@@ -502,85 +492,63 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		972A5E2E285D891100CB6440 /* XCRemoteSwiftPackageReference "Defaults" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/Defaults";
-			requirement = {
-				kind = revision;
-				revision = 8584d1d6ed36c195258977f2ed0cf95357efb160;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		A31C6E9D8B7F4101BFEA0001 /* XCLocalSwiftPackageReference "Modules/KeyKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/KeyKit;
 		};
-		977638F7286BE9EE00A698B6 /* XCRemoteSwiftPackageReference "PublishedObject" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Amzd/PublishedObject";
-			requirement = {
-				kind = revision;
-				revision = e61bfde22832ba8dfe9f8be2561838a1512e38af;
-			};
+		A31C6E9D8B7F4101BFEA0002 /* XCLocalSwiftPackageReference "Modules/DockKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/DockKit;
 		};
-		978DBCA429AB1732002259B3 /* XCRemoteSwiftPackageReference "JSONPatcher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/linearmouse/JSONPatcher.git";
-			requirement = {
-				kind = revision;
-				revision = fef582b56aff502305e4dbcfabf76cb57b5d4e15;
-			};
+		A31C6E9D8B7F4101BFEA0003 /* XCLocalSwiftPackageReference "Modules/PointerKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/PointerKit;
 		};
-		B7F6C5F627A4F6A800E5400B /* XCRemoteSwiftPackageReference "LRUCache" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nicklockwood/LRUCache.git";
-			requirement = {
-				kind = revision;
-				revision = 6d2b5246c9c98dcd498552bb22f08d55b12a8371;
-			};
+		A31C6E9D8B7F4101BFEA0004 /* XCLocalSwiftPackageReference "Modules/HIDPP" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/HIDPP;
 		};
-/* End XCRemoteSwiftPackageReference section */
+		A31C6E9D8B7F4101BFEA0005 /* XCLocalSwiftPackageReference "Modules/GestureKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/GestureKit;
+		};
+		A31C6E9D8B7F4101BFEA0006 /* XCLocalSwiftPackageReference "Modules/ObservationToken" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/ObservationToken;
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		9724FAC92A3E04DE00622F5A /* KeyKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A31C6E9D8B7F4101BFEA0001 /* XCLocalSwiftPackageReference "Modules/KeyKit" */;
 			productName = KeyKit;
-		};
-		972A5E2F285D891100CB6440 /* Defaults */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 972A5E2E285D891100CB6440 /* XCRemoteSwiftPackageReference "Defaults" */;
-			productName = Defaults;
 		};
 		975979DA2A6BA1A700016EDF /* ObservationToken */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A31C6E9D8B7F4101BFEA0006 /* XCLocalSwiftPackageReference "Modules/ObservationToken" */;
 			productName = ObservationToken;
-		};
-		977638F8286BE9EE00A698B6 /* PublishedObject */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 977638F7286BE9EE00A698B6 /* XCRemoteSwiftPackageReference "PublishedObject" */;
-			productName = PublishedObject;
-		};
-		978DBCA529AB1732002259B3 /* JSONPatcher */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 978DBCA429AB1732002259B3 /* XCRemoteSwiftPackageReference "JSONPatcher" */;
-			productName = JSONPatcher;
 		};
 		97A7A39B28587E8C00EE4833 /* PointerKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A31C6E9D8B7F4101BFEA0003 /* XCLocalSwiftPackageReference "Modules/PointerKit" */;
 			productName = PointerKit;
 		};
 		D1D1D1D1D1D1D1D1D1D1D1D1 /* HIDPP */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A31C6E9D8B7F4101BFEA0004 /* XCLocalSwiftPackageReference "Modules/HIDPP" */;
 			productName = HIDPP;
 		};
 		97C5D8FE2856E3CB00CBED2D /* GestureKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A31C6E9D8B7F4101BFEA0005 /* XCLocalSwiftPackageReference "Modules/GestureKit" */;
 			productName = GestureKit;
 		};
 		97C97727288FC49F009094BA /* DockKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A31C6E9D8B7F4101BFEA0002 /* XCLocalSwiftPackageReference "Modules/DockKit" */;
 			productName = DockKit;
-		};
-		B7F6C5F727A4F6A800E5400B /* LRUCache */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B7F6C5F627A4F6A800E5400B /* XCRemoteSwiftPackageReference "LRUCache" */;
-			productName = LRUCache;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

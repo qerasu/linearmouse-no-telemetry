@@ -1,35 +1,28 @@
 // MIT License
 // Copyright (c) 2021-2026 LinearMouse
 
-import Defaults
 import SwiftUI
 
 struct Settings: View {
-    @State private var showInDockTask: Task<Void, Never>?
+    @AppStorage(UserDefaultsKey.showInDock) private var showInDock = true
 
     var body: some View {
         EmptyView()
-            .onAppear(perform: startShowInDockTask)
-            .onDisappear(perform: stopShowInDockTask)
-    }
-
-    private func startShowInDockTask() {
-        showInDockTask = Task {
-            for await value in Defaults.updates(.showInDock, initial: true) {
-                if value {
-                    NSApplication.shared.setActivationPolicy(.regular)
-                } else {
-                    NSApplication.shared.setActivationPolicy(.accessory)
-                    NSApplication.shared.activate(ignoringOtherApps: true)
-                }
+            .onAppear(perform: updateActivationPolicy)
+            .onChange(of: showInDock) { _ in
+                updateActivationPolicy()
             }
-
-            NSApplication.shared.setActivationPolicy(.accessory)
-        }
+            .onDisappear {
+                NSApplication.shared.setActivationPolicy(.accessory)
+            }
     }
 
-    private func stopShowInDockTask() {
-        showInDockTask?.cancel()
-        showInDockTask = nil
+    private func updateActivationPolicy() {
+        if showInDock {
+            NSApplication.shared.setActivationPolicy(.regular)
+        } else {
+            NSApplication.shared.setActivationPolicy(.accessory)
+            NSApplication.shared.activate(ignoringOtherApps: true)
+        }
     }
 }

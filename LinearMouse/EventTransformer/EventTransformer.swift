@@ -2,7 +2,6 @@
 // Copyright (c) 2021-2026 LinearMouse
 
 import Foundation
-import LRUCache
 import os.log
 
 struct EventTransformerContext {

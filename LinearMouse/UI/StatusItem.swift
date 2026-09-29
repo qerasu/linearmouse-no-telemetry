@@ -2,7 +2,7 @@
 // Copyright (c) 2021-2026 LinearMouse
 
 import Combine
-import Defaults
+import Foundation
 import SwiftUI
 
 class StatusItem: NSObject {
@@ -133,22 +133,23 @@ class StatusItem: NSObject {
     }
 
     private static func migrateMenuBarVisibilityModeIfNeeded() {
-        if !Defaults[.menuBarVisibilityModeMigrationCompleted] {
-            Defaults[.menuBarVisibilityMode] = Defaults[.showInMenuBar] ? .always : .never
-            Defaults[.menuBarVisibilityModeMigrationCompleted] = true
+        let defaults = UserDefaults.standard
+        if !defaults.menuBarVisibilityModeMigrationCompleted {
+            defaults.menuBarVisibilityMode = defaults.showInMenuBar ? .always : .never
+            defaults.menuBarVisibilityModeMigrationCompleted = true
         }
 
-        if Defaults[.menuBarVisibilityMode] == .whenAttentionNeeded {
-            Defaults[.menuBarVisibilityMode] = .always
+        if defaults.menuBarVisibilityMode == .whenAttentionNeeded {
+            defaults.menuBarVisibilityMode = .always
         }
     }
 
     private static func syncLegacyShowInMenuBar() {
-        Defaults[.showInMenuBar] = Defaults[.menuBarVisibilityMode] != .never
+        UserDefaults.standard.showInMenuBar = UserDefaults.standard.menuBarVisibilityMode != .never
     }
 
     private func updateStatusItemPresentation() {
-        statusItem.isVisible = Defaults[.menuBarVisibilityMode] != .never
+        statusItem.isVisible = UserDefaults.standard.menuBarVisibilityMode != .never
     }
 
     private func baseMenuItems() -> [NSMenuItem] {
@@ -185,15 +186,21 @@ class StatusItem: NSObject {
     private func setup() {
         statusItem.menu = menu
 
-        Defaults.observe(.menuBarVisibilityMode) { [weak self] _ in
-            guard let self else {
-                return
-            }
+        let defaults = UserDefaults.standard
+        NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .map { _ in defaults.menuBarVisibilityMode }
+            .prepend(defaults.menuBarVisibilityMode)
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self else {
+                    return
+                }
 
-            Self.syncLegacyShowInMenuBar()
-            self.updateStatusItemPresentation()
-        }
-        .tieToLifetime(of: self)
+                Self.syncLegacyShowInMenuBar()
+                self.updateStatusItemPresentation()
+            }
+            .store(in: &subscriptions)
     }
 
     @objc private func statusItemAction(sender _: NSStatusBarButton) {

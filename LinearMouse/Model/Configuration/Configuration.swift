@@ -2,9 +2,7 @@
 // Copyright (c) 2021-2026 LinearMouse
 
 import AppKit
-import Defaults
 import Foundation
-import JSONPatcher
 
 struct Configuration: Codable, Equatable {
     var schemes: [Scheme] = []
@@ -63,14 +61,11 @@ extension Configuration {
     }
 
     static func load(from string: String) throws -> Configuration {
+        guard let data = string.data(using: .utf8) else {
+            throw ConfigurationError.unsupportedEncoding
+        }
         do {
-            let jsonPatcher = try JSONPatcher(original: string)
-            let json = jsonPatcher.json()
-            guard let data = json.data(using: .utf8) else {
-                throw ConfigurationError.unsupportedEncoding
-            }
-            let decoder = JSONDecoder()
-            return try decoder.decode(Configuration.self, from: data)
+            return try JSONDecoder().decode(Configuration.self, from: data)
         } catch {
             throw ConfigurationError.parseError(error)
         }

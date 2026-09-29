@@ -3,13 +3,22 @@
 
 import Combine
 import Foundation
-import PublishedObject
 import SwiftUI
 
 class ButtonsSettingsState: ObservableObject {
     static let shared: ButtonsSettingsState = .init()
 
-    @PublishedObject private var schemeState = SchemeState.shared
+    private let schemeState = SchemeState.shared
+    private var subscriptions = Set<AnyCancellable>()
+
+    private init() {
+        schemeState.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &subscriptions)
+    }
+
     var scheme: Scheme {
         get { schemeState.scheme }
         set { schemeState.scheme = newValue }

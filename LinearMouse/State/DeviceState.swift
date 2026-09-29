@@ -2,14 +2,8 @@
 // Copyright (c) 2021-2026 LinearMouse
 
 import Combine
-import Defaults
+import Foundation
 import SwiftUI
-
-extension Defaults.Keys {
-    static let autoSwitchToActiveDevice = Key<Bool>("autoSwitchToActiveDevice", default: true)
-
-    static let selectedDevice = Key<DeviceMatcher?>("selectedDevice", default: nil)
-}
 
 class DeviceState: ObservableObject {
     static let shared = DeviceState()
@@ -25,31 +19,34 @@ class DeviceState: ObservableObject {
                 return
             }
 
-            guard !Defaults[.autoSwitchToActiveDevice] else {
+            guard !UserDefaults.standard.autoSwitchToActiveDevice else {
                 return
             }
 
             let currentDeviceMatcher = currentDeviceRef?.value.map { DeviceMatcher(of: $0) }
-            guard Defaults[.selectedDevice] != currentDeviceMatcher else {
+            guard UserDefaults.standard.selectedDeviceMatcher != currentDeviceMatcher else {
                 return
             }
 
-            Defaults[.selectedDevice] = currentDeviceMatcher
+            UserDefaults.standard.selectedDeviceMatcher = currentDeviceMatcher
         }
     }
 
     init() {
-        Defaults.observe(keys: .autoSwitchToActiveDevice, .selectedDevice) { [weak self] in
-            self?.updateCurrentDevice()
-        }
-        .tieToLifetime(of: self)
-
-        Defaults.observe(.autoSwitchToActiveDevice) { change in
-            if change.newValue {
-                Defaults[.selectedDevice] = nil
+        let defaults = UserDefaults.standard
+        let devicePreferenceState = (defaults.autoSwitchToActiveDevice, defaults.selectedDeviceMatcher)
+        let devicePreferenceChanges = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .map { _ -> (Bool, DeviceMatcher?) in
+                (defaults.autoSwitchToActiveDevice, defaults.selectedDeviceMatcher)
             }
-        }
-        .tieToLifetime(of: self)
+        devicePreferenceChanges
+            .prepend(devicePreferenceState)
+            .removeDuplicates { $0.0 == $1.0 && $0.1 == $1.1 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateCurrentDevice()
+            }
+            .store(in: &subscriptions)
 
         deviceManager.$lastActiveDeviceRef
             .debounce(for: 0.1, scheduler: RunLoop.main)
@@ -88,13 +85,13 @@ extension DeviceState {
     }
 
     private func updateCurrentDeviceRef(lastActiveDeviceRef: WeakRef<Device>?) {
-        guard !Defaults[.autoSwitchToActiveDevice] else {
+        guard !UserDefaults.standard.autoSwitchToActiveDevice else {
             setCurrentDeviceRef(lastActiveDeviceRef)
             currentDeviceMatcher = exactMatcher(of: lastActiveDeviceRef)
             return
         }
 
-        guard let userSelectedDevice = Defaults[.selectedDevice] else {
+        guard let userSelectedDevice = UserDefaults.standard.selectedDeviceMatcher else {
             setCurrentDeviceRef(lastActiveDeviceRef)
             currentDeviceMatcher = exactMatcher(of: lastActiveDeviceRef)
             return

@@ -3,7 +3,6 @@
 
 import AppKit
 import Foundation
-import LRUCache
 import SwiftUI
 
 extension Comparable {
@@ -112,16 +111,36 @@ struct ProcessIdentity: Hashable {
     }
 }
 
-final class ProcessMetadataCache<Value> {
-    private let cache: LRUCache<ProcessIdentity, Value>
+final class HashableCacheKey<Key: Hashable>: NSObject {
+    private let key: Key
 
-    init(countLimit: Int) {
-        cache = LRUCache(countLimit: countLimit)
+    init(_ key: Key) {
+        self.key = key
     }
 
-    func value(for key: ProcessIdentity?, load: () -> Value?) -> Value? {
-        if let key, let cached = cache.value(forKey: key) {
-            return cached
+    override var hash: Int {
+        key.hashValue
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? HashableCacheKey<Key> else {
+            return false
+        }
+        return key == other.key
+    }
+}
+
+final class ProcessMetadataCache {
+    private let cache: NSCache<HashableCacheKey<ProcessIdentity>, NSString>
+
+    init(countLimit: Int) {
+        cache = NSCache()
+        cache.countLimit = countLimit
+    }
+
+    func value(for key: ProcessIdentity?, load: () -> String?) -> String? {
+        if let key, let cached = cache.object(forKey: HashableCacheKey(key)) {
+            return cached as String
         }
 
         guard let value = load() else {
@@ -129,7 +148,7 @@ final class ProcessMetadataCache<Value> {
         }
 
         if let key {
-            cache.setValue(value, forKey: key)
+            cache.setObject(value as NSString, forKey: HashableCacheKey(key))
         }
 
         return value
@@ -137,9 +156,9 @@ final class ProcessMetadataCache<Value> {
 }
 
 extension pid_t {
-    private static let bundleIdentifierCache = ProcessMetadataCache<String>(countLimit: 16)
-    private static let processPathCache = ProcessMetadataCache<String>(countLimit: 16)
-    private static let processNameCache = ProcessMetadataCache<String>(countLimit: 16)
+    private static let bundleIdentifierCache = ProcessMetadataCache(countLimit: 16)
+    private static let processPathCache = ProcessMetadataCache(countLimit: 16)
+    private static let processNameCache = ProcessMetadataCache(countLimit: 16)
 
     var processIdentity: ProcessIdentity? {
         ProcessIdentity(pid: self)

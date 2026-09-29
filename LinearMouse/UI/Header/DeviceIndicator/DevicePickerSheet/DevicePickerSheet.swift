@@ -1,12 +1,12 @@
 // MIT License
 // Copyright (c) 2021-2026 LinearMouse
 
-import Defaults
+import Foundation
 import SwiftUI
 
 struct DevicePickerSheet: View {
     @Binding var isPresented: Bool
-    @State private var autoSwitchToActiveDevice = Defaults[.autoSwitchToActiveDevice]
+    @State private var autoSwitchToActiveDevice = UserDefaults.standard.autoSwitchToActiveDevice
     @State private var selection: DevicePickerSelection?
     @State private var showDeleteAlert = false
 
@@ -96,10 +96,10 @@ struct DevicePickerSheet: View {
             isPresented = false
         }
         .onAppear {
-            autoSwitchToActiveDevice = Defaults[.autoSwitchToActiveDevice]
+            autoSwitchToActiveDevice = UserDefaults.standard.autoSwitchToActiveDevice
             if autoSwitchToActiveDevice {
                 syncSelectionWithActiveDevice()
-            } else if let selectedDevice = Defaults[.selectedDevice] {
+            } else if let selectedDevice = UserDefaults.standard.selectedDeviceMatcher {
                 selection = selection(for: selectedDevice)
             } else {
                 syncSelectionWithCurrentDevice()
@@ -169,11 +169,9 @@ struct DevicePickerSheet: View {
     }
 
     private func onOK() {
-        Defaults[.autoSwitchToActiveDevice] = autoSwitchToActiveDevice
+        UserDefaults.standard.autoSwitchToActiveDevice = autoSwitchToActiveDevice
 
-        if !autoSwitchToActiveDevice {
-            Defaults[.selectedDevice] = selectedDeviceMatcher
-        }
+        UserDefaults.standard.selectedDeviceMatcher = autoSwitchToActiveDevice ? nil : selectedDeviceMatcher
 
         isPresented = false
     }

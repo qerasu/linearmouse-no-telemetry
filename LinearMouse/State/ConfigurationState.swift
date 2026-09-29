@@ -3,7 +3,6 @@
 
 import AppKit
 import Combine
-import Defaults
 import Foundation
 import os.log
 import SwiftUI

@@ -2,7 +2,6 @@
 // Copyright (c) 2021-2026 LinearMouse
 
 import Combine
-import Defaults
 import Foundation
 import HIDPP
 import ObservationToken

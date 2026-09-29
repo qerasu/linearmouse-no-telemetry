@@ -2,16 +2,16 @@
 // Copyright (c) 2021-2026 LinearMouse
 
 import Combine
-import Defaults
 import Foundation
-import LRUCache
 import os.log
 
 class EventTransformerManager {
     static let shared = EventTransformerManager()
     static let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "EventTransformerManager")
 
-    @Default(.bypassEventsFromOtherApplications) var bypassEventsFromOtherApplications
+    private var bypassEventsFromOtherApplications: Bool {
+        UserDefaults.standard.bypassEventsFromOtherApplications
+    }
 
     private final class TransformerRoute {
         let id = UUID()
@@ -22,7 +22,7 @@ class EventTransformerManager {
         }
     }
 
-    private var eventTransformerCache = LRUCache<CacheKey, TransformerRoute>(countLimit: 16)
+    private let eventTransformerCache = NSCache<HashableCacheKey<CacheKey>, TransformerRoute>()
     private var activeRoute: TransformerRoute?
     private var retiredRoutes = [UUID: TransformerRoute]()
     private var sharedAutoScrollTransformer: AutoScrollTransformer?
@@ -97,6 +97,8 @@ class EventTransformerManager {
     private var subscriptions = Set<AnyCancellable>()
 
     init() {
+        eventTransformerCache.countLimit = 16
+
         ConfigurationState.shared
             .$configuration
             .removeDuplicates()
@@ -727,7 +729,7 @@ class EventTransformerManager {
             process: process,
             screen: display
         )
-        if let route = eventTransformerCache.value(forKey: cacheKey) {
+        if let route = eventTransformerCache.object(forKey: HashableCacheKey(cacheKey)) {
             if updateActiveRoute {
                 activeRoute = route
             }
@@ -904,7 +906,7 @@ class EventTransformerManager {
         }
 
         let route = TransformerRoute(transformer: eventTransformer)
-        eventTransformerCache.setValue(route, forKey: cacheKey)
+        eventTransformerCache.setObject(route, forKey: HashableCacheKey(cacheKey))
         if updateActiveRoute {
             activeRoute = route
         }
@@ -1045,7 +1047,7 @@ class EventTransformerManager {
         }
 
         activeRoute = nil
-        eventTransformerCache.removeAllValues()
+        eventTransformerCache.removeAllObjects()
 
         if preservedAutoScrollTransformer == nil {
             sharedAutoScrollTransformer = nil
@@ -1072,7 +1074,7 @@ class EventTransformerManager {
         sharedAutoScrollTransformer = nil
         activeInteractions.removeAll()
         activeRoute = nil
-        eventTransformerCache.removeAllValues()
+        eventTransformerCache.removeAllObjects()
         retiredRoutes.removeAll()
         oldAutoScroll?.deactivate()
     }
