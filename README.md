@@ -1,6 +1,6 @@
-# LinearMouse — local fork
+# LinearMouse without telemetry and external packages
 
-macOS utility for configuring mouse and trackpad behavior. No analytics or telemetry.
+macOS utility for configuring mouse and trackpad behavior. No analytics, telemetry or external packages.
 
 Compared with upstream LinearMouse, this fork removes automatic updates, external help and feedback links,
 non-English translations, battery monitoring, pointer reveal, and event-log export. It replaces the
