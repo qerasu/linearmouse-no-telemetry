@@ -742,10 +742,10 @@ final class EventTransformerManagerTests: XCTestCase {
             Scheme(buttons: .init(mappings: [mapping]))
         ])
         let manager = EventTransformerManager()
-        let previousBypassSetting = manager.bypassEventsFromOtherApplications
-        manager.bypassEventsFromOtherApplications = true
+        let previousBypassSetting = UserDefaults.standard.bypassEventsFromOtherApplications
+        UserDefaults.standard.bypassEventsFromOtherApplications = true
         defer {
-            manager.bypassEventsFromOtherApplications = previousBypassSetting
+            UserDefaults.standard.bypassEventsFromOtherApplications = previousBypassSetting
         }
 
         let button = try XCTUnwrap(CGMouseButton(rawValue: 4))
@@ -787,10 +787,10 @@ final class EventTransformerManagerTests: XCTestCase {
             ))
         ])
         let manager = EventTransformerManager()
-        let previousBypassSetting = manager.bypassEventsFromOtherApplications
-        manager.bypassEventsFromOtherApplications = true
+        let previousBypassSetting = UserDefaults.standard.bypassEventsFromOtherApplications
+        UserDefaults.standard.bypassEventsFromOtherApplications = true
         defer {
-            manager.bypassEventsFromOtherApplications = previousBypassSetting
+            UserDefaults.standard.bypassEventsFromOtherApplications = previousBypassSetting
         }
 
         let mappedButton = try XCTUnwrap(CGMouseButton(rawValue: 4))
